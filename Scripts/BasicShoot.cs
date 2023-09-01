@@ -7,7 +7,7 @@ public class BasicShoot : NetworkBehaviour
 {
     [SerializeField] private LayerMask canHitMask;
     [SerializeField] private AudioSource source;
-    [SerializeField] private GameObject muzzle;
+    [SerializeField] private ParticleSystem muzzle;
     [SerializeField] private Jolt jolt;
     private float range = Mathf.Infinity;
     private int bulletDamage = 1;
@@ -20,10 +20,17 @@ public class BasicShoot : NetworkBehaviour
         }
     }
     private void BaseGunCosmeticEffects()
-    { 
-        if (muzzle != null) muzzle.SetActive(true);
+    {
+        if (muzzle != null) muzzle.Play();
         if (jolt != null) jolt.FireJolt();
-        PlayClipAtPoint(source.clip, transform.position, 1);
+        if (IsOwner)
+        {
+            source.PlayOneShot(source.clip);
+        }
+        else
+        { 
+            PlayClipAtPoint(source.clip, transform.position, 1);
+        }
     }
     public void ShowGunCosmeticEffects(byte id = 0)
     {
