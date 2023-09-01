@@ -16,67 +16,53 @@ public class BasicShoot : NetworkBehaviour
          if (Input.GetMouseButtonDown(0))
         {
             ClientShoot();
-            PlayShootSound();
-            JoltWeapon();
-            ShowMuzzleFlash();
+            ShowGunCosmeticEffects(); 
         }
     }
-    private void ShowMuzzleFlash()
-    {
+    private void BaseGunCosmeticEffects()
+    { 
         if (muzzle != null) muzzle.SetActive(true);
-        if (IsServer)
-        {
-            ShowMuzzleFlashClientRpc();
-        }
-        else
-        {
-            ShowMuzzleFlashServerRpc();
-        }
+        if (jolt != null) jolt.FireJolt();
+        PlayClipAtPoint(source.clip, transform.position, 1);
     }
-    private void BaseMuzzleFlash()
+    public void ShowGunCosmeticEffects(byte id = 0)
     {
-        if (!IsOwner)
-        { 
-            if (muzzle != null) muzzle.SetActive(true);
-        }
+        //fire locally  
+        BaseGunCosmeticEffects();
+        //request server to send to other clients
+        ShowGunCosmeticEffectsServerRpc(id);
+    }
+    [ServerRpc] //(RequireOwnership = false)
+    private void ShowGunCosmeticEffectsServerRpc(byte id = 0)
+    {
+        ShowGunCosmeticEffectsClientRpc(id);
     }
     [ClientRpc]
-    private void ShowMuzzleFlashClientRpc() //tell all clients to show muzzle flash
+    private void ShowGunCosmeticEffectsClientRpc(byte id = 0)
     {
-        BaseMuzzleFlash();
-    }
-    [ServerRpc]
-    private void ShowMuzzleFlashServerRpc() //ask server to tell clients
-    {
-        ShowMuzzleFlashClientRpc();
-    }
-    private void JoltWeapon()
-    {
-        if (jolt != null) jolt.FireJolt();
-    }
-    private void PlayShootSound()
-    {
-        //client plays sound
-        source.PlayOneShot(source.clip); 
-        /*if (IsServer) //tell all other clients to play sound at this position
-        { 
-        }
-        else
+        if (!IsOwner)
         {
-
-        }*/
-    }
-    /*[ClientRpc]
-    private void ShootSoundClientRpc()
+            BaseGunCosmeticEffects();
+        }
+    }   
+    
+    public AudioSource PlayClipAtPoint(AudioClip clip, Vector3 pos, float volume = 1, float pitch = 1, bool useChorus = false)
     {
-        AudioSource.PlayClipAtPoint(source.clip, );
-
+        GameObject tempGO = new("TempAudio"); // create the temp object
+        tempGO.transform.position = pos; // set its position
+        AudioSource tempASource = tempGO.AddComponent<AudioSource>(); // add an audio source
+        if (useChorus)
+        {
+            tempGO.AddComponent<AudioChorusFilter>();
+        }
+        tempASource.clip = clip;
+        tempASource.volume = volume;
+        tempASource.pitch = pitch;
+        tempASource.spatialBlend = 1; //3d   
+        tempASource.Play(); // start the sound
+        Destroy(tempGO, tempASource.clip.length * pitch); // destroy object after clip duration (this will not account for whether it is set to loop) 
+        return tempASource;
     }
-    [ServerRpc]
-    private void ShootSoundServerRpc()
-    {
-
-    }*/
     private void ClientShoot() //shoot raycast at target client side
     {
         Vector3 shootDirection = transform.forward;
