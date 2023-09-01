@@ -4,22 +4,23 @@ using UnityEngine;
 using Unity.Netcode;
 
 public class PlayerNetwork : NetworkBehaviour
-{
+{ 
     public PlayerMovement movement;
     public MouseLook look;
     public AudioListener listener;
     public Camera cam;
+    public BasicShoot shoot;
 
     public override void OnNetworkSpawn()
-    {
-        if (!IsOwner)
+    {  
+        if (!IsOwner) //disable client-only functionality
         {
             movement.enabled = false;
             listener.enabled = false;
             cam.enabled = false;
             look.enabled = false;
-            enabled = false;
-            
+            shoot.enabled = false;
+            enabled = false; 
         } 
     }
 }
