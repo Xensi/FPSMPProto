@@ -102,7 +102,7 @@ public class PlayerMovement : NetworkBehaviour
 
         if (isGrounded)
         {
-            if (moveDirection.sqrMagnitude < .1f)
+            if (body.velocity.sqrMagnitude < .1f)
             {
                 playerMovementState = MovementStates.Idle;
             }

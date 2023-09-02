@@ -9,29 +9,50 @@ public class Hurtbox : NetworkBehaviour
     private const int initialHP = 10;
     [SerializeField] private GameObject player;
     public override void OnNetworkSpawn()
+    { 
+        Respawn();
+    }
+    private void Respawn()
     {
         if (IsServer)
         {
-            Respawn();
+            playerHP.Value = initialHP;
         }
+        SpawnRandom();
+    }
+    private void SpawnRandom()
+    {
+        if (IsOwner)
+        {
+            player.transform.position = RespawnManager.Instance.respawnPoints[Random.Range(0, RespawnManager.Instance.respawnPoints.Count)].position;
+        } 
     }
     private void Update()
     {
         if (IsServer)
-        {
+        { 
             CheckIfDead();
         }
     }
     private void CheckIfDead()
     {
         if (playerHP.Value <= 0)
-        {
-            Respawn();
+        { 
+            playerHP.Value = initialHP;
+            
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { OwnerClientId }
+                }
+            };
+            RespawnClientRpc();
         }
     }
-    private void Respawn()
+    [ClientRpc]
+    private void RespawnClientRpc(ClientRpcParams clientParams = default)
     {
-        playerHP.Value = initialHP;
-        player.transform.position = Vector3.zero;//RespawnManager.Instance.respawnPoints[Random.Range(0, RespawnManager.Instance.respawnPoints.Count)].position;
+        SpawnRandom();
     }
 }

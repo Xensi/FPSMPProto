@@ -19,6 +19,13 @@ public class BasicShoot : NetworkBehaviour
             ShowGunCosmeticEffects(); 
         }
     }
+    public void ShowGunCosmeticEffects(byte id = 0)
+    {
+        //fire locally  
+        BaseGunCosmeticEffects();
+        //request server to send to other clients
+        ShowGunCosmeticEffectsServerRpc(id);
+    }
     private void BaseGunCosmeticEffects()
     {
         if (muzzle != null) muzzle.Play();
@@ -31,13 +38,6 @@ public class BasicShoot : NetworkBehaviour
         { 
             PlayClipAtPoint(source.clip, transform.position, 1);
         }
-    }
-    public void ShowGunCosmeticEffects(byte id = 0)
-    {
-        //fire locally  
-        BaseGunCosmeticEffects();
-        //request server to send to other clients
-        ShowGunCosmeticEffectsServerRpc(id);
     }
     [ServerRpc] //(RequireOwnership = false)
     private void ShowGunCosmeticEffectsServerRpc(byte id = 0)
