@@ -9,8 +9,7 @@ public class ClientSideComponents : NetworkBehaviour
     public MouseLook look;
     public AudioListener listener;
     public Camera cam;
-    public BasicShoot shoot;
-    public CharacterController controller;
+    public BasicShoot shoot; 
     //cosmetic items should remain enabled, like jolt
     public override void OnNetworkSpawn()
     {  
@@ -21,7 +20,7 @@ public class ClientSideComponents : NetworkBehaviour
             cam.enabled = false;
             look.enabled = false;
             shoot.enabled = false;
-            controller.enabled = false;
+             
             enabled = false; 
         } 
     }

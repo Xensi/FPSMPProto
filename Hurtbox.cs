@@ -6,12 +6,32 @@ using Unity.Netcode;
 public class Hurtbox : NetworkBehaviour
 {
     public NetworkVariable<int> playerHP = new NetworkVariable<int>();
-    private const int initialHP = 100;
+    private const int initialHP = 10;
+    [SerializeField] private GameObject player;
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            playerHP.Value = initialHP;
+            Respawn();
         }
+    }
+    private void Update()
+    {
+        if (IsServer)
+        {
+            CheckIfDead();
+        }
+    }
+    private void CheckIfDead()
+    {
+        if (playerHP.Value <= 0)
+        {
+            Respawn();
+        }
+    }
+    private void Respawn()
+    {
+        playerHP.Value = initialHP;
+        player.transform.position = Vector3.zero;//RespawnManager.Instance.respawnPoints[Random.Range(0, RespawnManager.Instance.respawnPoints.Count)].position;
     }
 }

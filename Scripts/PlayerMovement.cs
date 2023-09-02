@@ -9,24 +9,39 @@ public class PlayerMovement : NetworkBehaviour
     public float defaultSpeed = 12f;
     public float sprintMult = 1.3f;
     public float groundRadius = 0.4f; //radius 
-    public CharacterController controller;
+    public Rigidbody body;
     private float moveSpeed;
-    private float gravity = -19.62f;//-9.81f;
+    private readonly float gravity = -19.62f;//-9.81f;
 
     public Transform groundCheck; //position to check ground at
     public LayerMask groundMask;
 
     private bool isGrounded;
 
-    private Vector3 velocity; 
+    private Vector3 velocity;
+
+    [SerializeField] private Animator animator;
+    public enum MovementStates
+    {
+        Idle, Walking, Jumping
+    }
+    public MovementStates playerMovementState = MovementStates.Idle;
+
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
     }
-    void Update()
+    private void Update()
+    { 
+        Jump();
+    }
+    void FixedUpdate()
     {
         Move();
     }
+    private float x;
+    private float z;
+    private Vector3 moveDirection;
     void Move()
     {
         //RaycastHit hit;
@@ -36,14 +51,10 @@ public class PlayerMovement : NetworkBehaviour
             Rigidbody body = hit.collider.GetComponentInParent<Rigidbody>();
             body.AddForceAtPosition(Vector3.down * 10, transform.position, ForceMode.Impulse);
         }*/
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundRadius, groundMask);
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f; //negative to force onto ground
-        }
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-        Vector3 move = transform.right * x + transform.forward * z;
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundRadius, groundMask); 
+        x = Input.GetAxis("Horizontal");
+        z = Input.GetAxis("Vertical");
+        moveDirection = transform.right * x + transform.forward * z;
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
@@ -53,17 +64,93 @@ public class PlayerMovement : NetworkBehaviour
         {
             moveSpeed = defaultSpeed;
         }
-
-        controller.Move(move * moveSpeed * Time.deltaTime);
-
-        if (Input.GetButtonDown("Jump") && isGrounded)
+         
+        if (isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity); //some physics equation for velocity needed to jump a height
+            body.AddForce(moveSpeed * moveDirection.normalized * 10, ForceMode.Force); 
         }
 
-        //gravity
-        velocity.y += gravity * Time.deltaTime;
+        //WallRunMovement();
+        UpdateDrag();
+        UpdateState();
+        UpdateAnimation();
+    }
+    private float groundDrag = 8f;
+    private void Jump()
+    {
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            //velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity); //some physics equation for velocity needed to jump a height
 
-        controller.Move(velocity * Time.deltaTime);
+            body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
+            body.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
+        } 
+    }
+    private void UpdateDrag()
+    {
+        if (isGrounded)
+        {
+            body.drag = groundDrag;
+        }
+        else
+        {
+            body.drag = 0;
+        }
+    }
+    private void UpdateState()
+    {
+
+        if (isGrounded)
+        {
+            if (moveDirection.sqrMagnitude < .1f)
+            {
+                playerMovementState = MovementStates.Idle;
+            }
+            else
+            {
+                playerMovementState = MovementStates.Walking;
+            }
+        }
+        else
+        {
+            playerMovementState = MovementStates.Jumping;
+        }
+    }
+    private void UpdateAnimation()
+    {
+        switch (playerMovementState)
+        {   
+            case MovementStates.Idle:
+                animator.Play("Idle");
+                break;
+            case MovementStates.Walking:
+                animator.Play("Walk");
+                break;
+            case MovementStates.Jumping:
+                animator.Play("Jump");
+                break;
+            default:
+                break;
+        }
+    }
+    private bool wallRight;
+    private bool wallLeft;
+    private RaycastHit outRightHit;
+    private RaycastHit outLeftHit;
+    private float wallCheckDist = 0.6f;
+    [SerializeField] private LayerMask wallMask;
+    private void CheckWalls()
+    {
+        wallRight = Physics.Raycast(transform.position, transform.right, out outRightHit, wallCheckDist, wallMask);
+        wallLeft = Physics.Raycast(transform.position, -transform.right, out outLeftHit, wallCheckDist, wallMask);
+    }
+    private void WallRunMovement()
+    {
+        CheckWalls();
+        if ((wallRight || wallLeft) && z > 0 & !isGrounded)
+        {
+            Vector3 wallNormal = wallRight ? outRightHit.normal : outLeftHit.normal;
+            Vector3 wallForward = Vector3.Cross(wallNormal, transform.up);
+        } 
     }
 }

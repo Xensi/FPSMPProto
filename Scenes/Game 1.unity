@@ -299,9 +299,9 @@ MonoBehaviour:
     Port: 7777
     ServerListenAddress: 127.0.0.1
   DebugSimulator:
-    PacketDelayMS: 10
-    PacketJitterMS: 5
-    PacketDropRate: 3
+    PacketDelayMS: 0
+    PacketJitterMS: 0
+    PacketDropRate: 0
 --- !u!114 &371360519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,6 +367,69 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enable: 0
+--- !u!1001 &463051398
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6077216827917592691, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 155137781
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847028, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462728764829847030, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2916edba9511d7f409d89115c7967c93, type: 3}
 --- !u!1 &597017189
 GameObject:
   m_ObjectHideFlags: 0
