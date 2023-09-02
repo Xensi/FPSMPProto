@@ -15,10 +15,7 @@ public class Jolt : MonoBehaviour
     public float joltY = 2;
     public float joltZ = 0.35f;
     public float joltSnapSpeed = 6;
-    public float joltReturnSpeed = 100f; 
-    private void Awake()
-    { 
-    } 
+    public float joltReturnSpeed = 100f;  
     private void Update()
     {
         targetRotation = Vector3.Lerp(targetRotation, Vector3.zero, joltReturnSpeed * Time.deltaTime);
@@ -29,14 +26,7 @@ public class Jolt : MonoBehaviour
         targetPos = Vector3.Lerp(targetPos, defaultPos, joltReturnSpeed * Time.deltaTime);
         transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, joltSnapSpeed * Time.fixedDeltaTime);
         
-    }
-    /*public void UpdateJoltValues()
-    {
-        joltX = WeaponSwitcher.Instance.activeWeapon.joltX;
-        joltY = WeaponSwitcher.Instance.activeWeapon.joltY;
-        joltZ = WeaponSwitcher.Instance.activeWeapon.joltZ;
-        joltReturnSpeed = WeaponSwitcher.Instance.activeWeapon.joltReturnSpeed;
-    }*/
+    } 
     public void FireJolt()
     {
         targetRotation += new Vector3(joltX, Random.Range(-joltY, joltY), Random.Range(-joltZ, joltZ));
