@@ -16,13 +16,34 @@ public class GrappleHook : MonoBehaviour
             if (joint == null)
             { 
                 Grapple();
+            } 
+        }
+        if (Input.GetKey(KeyCode.Q))
+        {
+            if (joint != null)
+            {
+                ShortenCable();
             }
-            else
+        }
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            if (joint != null)
             {
                 StopGrapple();
             }
         }
     }
+    [SerializeField] private float drawInSpeed = 1000;
+    private void ShortenCable()
+    {
+        Vector3 dir = grapplePoint.position - grappleOrigin.position;
+        body.AddForce(dir.normalized * drawInSpeed * Time.deltaTime, ForceMode.Force);
+        float distFromPoint = Vector3.Distance(player.transform.position, grapplePoint.position);
+
+        joint.maxDistance = distFromPoint * 0.8f;
+        joint.minDistance = distFromPoint * .2f;
+    }
+
     private void StopGrapple()
     {
         line.positionCount = 0;
@@ -35,6 +56,7 @@ public class GrappleHook : MonoBehaviour
             DrawRope();
         }
     }
+    [SerializeField] private Rigidbody body;
     [SerializeField] private LineRenderer line;
     private void DrawRope()
     {

@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 public class ClientSideComponents : NetworkBehaviour
 {   //disable components that are used only by the client on other players' games
-    public PlayerMovement movement;
+    public BasicPlayerMovement movement;
     public MouseLook look;
     public AudioListener listener;
     public Camera cam;

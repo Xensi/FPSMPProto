@@ -479,6 +479,7 @@ GameObject:
   - component: {fileID: 7384771093570517002}
   - component: {fileID: 5298776175611351591}
   - component: {fileID: 5364256218112139690}
+  - component: {fileID: 129518651627175581}
   m_Layer: 7
   m_Name: ActualPlayer
   m_TagString: Untagged
@@ -575,7 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39007adfe95144c42adba593cc0059ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movement: {fileID: 5364256218112139690}
+  movement: {fileID: 0}
   look: {fileID: 3333453177671188873}
   listener: {fileID: 424436995663762463}
   cam: {fileID: 6452688468534076305}
@@ -593,21 +594,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b79ea6a052541e04dbc00e16940ce651, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpHeight: 40
-  defaultSpeed: 36
-  sprintMult: 1.3
-  groundRadius: 0.45
+  animator: {fileID: 2053761275609403919}
+  speed: {fileID: 956177003965510770}
   body: {fileID: 2621009268359969232}
   groundCheck: {fileID: 1449962462117053268}
   groundMask:
     serializedVersion: 2
     m_Bits: 319
-  animator: {fileID: 2053761275609403919}
   playerMovementState: 0
-  speed: {fileID: 956177003965510770}
   wallMask:
     serializedVersion: 2
     m_Bits: 63
+--- !u!114 &129518651627175581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2810248955215482760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 854778b88439ca444aa643438a7fe190, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 2053761275609403919}
+  speed: {fileID: 956177003965510770}
+  body: {fileID: 2621009268359969232}
+  groundCheck: {fileID: 1449962462117053268}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 63
+  playerMovementState: 0
 --- !u!1 &2850919855439785922
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,7 +676,7 @@ MonoBehaviour:
   highPos: {fileID: 2379932305176888274}
   jumpPos: {fileID: 1997461112378579804}
   jolt: {fileID: 6659065980424095273}
-  movement: {fileID: 5364256218112139690}
+  movement: {fileID: 0}
 --- !u!1 &2925671442232918446
 GameObject:
   m_ObjectHideFlags: 0

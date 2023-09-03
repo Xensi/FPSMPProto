@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 109106, guid: 3fcbc3d2087395d4abd3ca66488a608d, type: 3}
       propertyPath: m_Name
-      value: YellowFireSmallMuzzleFlash
+      value: YellowFireSmallMuzzleFlash Variant
       objectReference: {fileID: 0}
     - target: {fileID: 402600, guid: 3fcbc3d2087395d4abd3ca66488a608d, type: 3}
       propertyPath: m_RootOrder
@@ -54,6 +54,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 402600, guid: 3fcbc3d2087395d4abd3ca66488a608d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 19803036, guid: 3fcbc3d2087395d4abd3ca66488a608d, type: 3}
+      propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

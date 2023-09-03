@@ -10,7 +10,7 @@ public class VisualGunAdjust : MonoBehaviour
     [SerializeField] private Transform highPos;
     [SerializeField] private Transform jumpPos;
     [SerializeField] private Jolt jolt;
-    [SerializeField] private PlayerMovement movement;
+    [SerializeField] private BasicPlayerMovement movement;
 
     private float t = 0;
     private float x = 0;
@@ -19,9 +19,9 @@ public class VisualGunAdjust : MonoBehaviour
     {
         switch (movement.playerMovementState)
         {
-            case PlayerMovement.MovementStates.Idle: 
-            case PlayerMovement.MovementStates.Walking:  
-            case PlayerMovement.MovementStates.Jumping:
+            case BasicPlayerMovement.MovementStates.Idle: 
+            case BasicPlayerMovement.MovementStates.Walking:  
+            case BasicPlayerMovement.MovementStates.Jumping:
                 x = angle.eulerAngles.x;
                 if (x >= 0 && x <= 90)
                 {

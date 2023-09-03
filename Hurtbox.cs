@@ -6,7 +6,7 @@ using Unity.Netcode;
 public class Hurtbox : NetworkBehaviour
 {
     public NetworkVariable<int> playerHP = new NetworkVariable<int>();
-    private const int initialHP = 10;
+    private const int initialHP = 5;
     [SerializeField] private GameObject player;
     public override void OnNetworkSpawn()
     { 

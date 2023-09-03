@@ -5,18 +5,34 @@ using Unity.Netcode;
 
 public class BasicShoot : NetworkBehaviour
 {
+    [SerializeField] private WeaponData equippedWeapon;
     [SerializeField] private LayerMask canHitMask;
     [SerializeField] private AudioSource source;
-    [SerializeField] private ParticleSystem muzzle;
+    public ParticleSystem muzzle;
     [SerializeField] private Jolt jolt;
     private float range = Mathf.Infinity;
     private int bulletDamage = 1;
+
+    private float weaponTimer;
+    public float timeBetweenShots = 0.1f; //can only fire if weapon timer is greater than time between shots
+    private void Start()
+    {
+        weaponTimer = timeBetweenShots;
+    }
     private void Update()
     {
-         if (Input.GetMouseButtonDown(0))
+        if (weaponTimer < timeBetweenShots)
         {
-            ClientShoot();
-            ShowGunCosmeticEffects(); 
+            weaponTimer += Time.deltaTime;
+        }
+        if (Input.GetMouseButton(0))
+        {
+            if (weaponTimer >= timeBetweenShots)
+            {
+                weaponTimer = 0;
+                ClientShoot();
+                ShowGunCosmeticEffects();
+            }
         }
     }
     public void ShowGunCosmeticEffects(byte id = 0)
