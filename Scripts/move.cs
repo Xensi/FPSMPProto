@@ -2,11 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using Unity.Netcode;
-public class AdvancedPlayerMovement : NetworkBehaviour
-{
-    [SerializeField] protected Animator animator;
-    [SerializeField] protected TMP_Text speed;
+public class move : MonoBehaviour
+{ 
     public Rigidbody body;
     protected float jumpHeight = 40f;
     protected float defaultSpeed = 36f;
@@ -110,8 +107,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         Walk();
         //WallRunMovement();
         UpdateDrag();
-        //UpdateState();
-        //UpdateAnimation();
+        //UpdateState(); 
         //speed.text = "Speed: " + body.velocity.magnitude;
     }
     private void UpdateDrag()
@@ -192,25 +188,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
                 playerMovementState = MovementStates.Jumping;
             }
         }
-    }
-    private void UpdateAnimation()
-    {
-        switch (playerMovementState)
-        {
-            case MovementStates.Idle:
-                animator.Play("Idle");
-                break;
-            case MovementStates.Wallrunning: 
-            case MovementStates.Walking:
-                animator.Play("Walk");
-                break;
-            case MovementStates.Jumping:
-                animator.Play("Jump");
-                break;
-            default:
-                break;
-        }
-    }
+    } 
     private bool CheckWalls()
     {
         wallRight = Physics.Raycast(transform.position, transform.right, out outRightHit, wallCheckDist, wallMask);
