@@ -23,6 +23,7 @@ public class AdvancedPlayerMovement : BasicPlayerMovement
     }
     private void Walk()
     {
+        //try tying to camera angle?
         x = Input.GetAxis("Horizontal");
         z = Input.GetAxis("Vertical");
         moveDirection = transform.right * x + transform.forward * z;

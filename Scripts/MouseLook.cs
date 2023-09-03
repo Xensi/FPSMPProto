@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class MouseLook : MonoBehaviour
 {
-    public float mouseSensitivity = 400f;
+    private float mouseSensitivity = 400f;
 
     public Transform playerBody;
-    public Transform camPos;
+    //public Transform camPos;
 
     private float xRotation;
     private float yRotation;
@@ -21,16 +21,27 @@ public class MouseLook : MonoBehaviour
      
     void Update()
     {
-        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        LookAround();
+    }
+    private void LookAround()
+    { 
+        // up and down synced, side to side not synced ???
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
         yRotation += mouseX;
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90, 90); //prevent over rotation
 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0); //rotate camera locally 
-        transform.position = camPos.position;
-        playerBody.SetPositionAndRotation(playerBody.transform.position, Quaternion.Euler(0, yRotation, 0));
-         
+        //playerBody.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+        //transform.position = camPos.position;
+        //playerBody.SetPositionAndRotation(playerBody.transform.position, Quaternion.Euler(0, yRotation, 0));
+        //playerBody.rotation = transform.rotation;
+
+        /*if (!Input.GetKey(KeyCode.E))
+        {
+            
+        }*/
     }
 }

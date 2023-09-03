@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class ClientSideComponents : NetworkBehaviour
+public class DisableComponentsForNonOwners : NetworkBehaviour
 {   //disable components that are used only by the client on other players' games
     public BasicPlayerMovement movement;
     public MouseLook look;
@@ -16,12 +16,12 @@ public class ClientSideComponents : NetworkBehaviour
     {  
         if (!IsOwner) //disable client-only functionality
         {
-            movement.enabled = false;
-            listener.enabled = false;
-            cam.enabled = false;
-            gunCam.enabled = false;
-            look.enabled = false;
-            shoot.enabled = false;
+            if (movement != null) movement.enabled = false;
+            if (listener != null) listener.enabled = false;
+            if (cam != null) cam.enabled = false;
+            if (gunCam != null) gunCam.enabled = false;
+            if (look != null) look.enabled = false;
+            if (shoot != null) shoot.enabled = false;
              
             enabled = false; 
         } 
