@@ -197,7 +197,7 @@ public class PlayerMovement : NetworkBehaviour
                 wallForward = -wallForward;
             }
              
-            body.AddForce(wallForward * moveSpeed * 15, ForceMode.Force);
+            body.AddForce(wallForward * moveSpeed * 10, ForceMode.Force);
             if (!(wallLeft && x > 0) && !(wallRight && x < 0)) //stick on
             {
                 //body.AddForce(-wallNormal * 100, ForceMode.Force); 
