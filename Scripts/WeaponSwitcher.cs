@@ -9,21 +9,46 @@ public class WeaponSwitcher : NetworkBehaviour
     [SerializeField] private BasicShoot shooter;
     private void Start()
     {
-        SwitchToWeapon(0);
-    }
+        SwitchToWeaponBase(0);
+    } 
     void Update()
 	{
-        if (Input.inputString != "")
+        if (IsOwner)
         {
-            int number;
-            bool is_a_number = Int32.TryParse(Input.inputString, out number);
-            if (is_a_number && number >= 0 && number < 10)
+            if (Input.inputString != "")
             {
-                SwitchToWeapon(number-1);
+                int number;
+                bool is_a_number = Int32.TryParse(Input.inputString, out number);
+                if (is_a_number && number >= 0 && number < 10)
+                {
+                    SwitchWeaponUmbrella(number - 1);
+                }
             }
+        } 
+    }
+    private void SwitchWeaponUmbrella(int id = 0)
+    {
+        if (IsServer)
+        {
+            SwitchWeaponClientRpc(id);
+        }
+        else
+        {
+            SwitchWeaponServerRpc(id);
         }
     }
-    private void SwitchToWeapon(int id = 0)
+    [ClientRpc]
+    private void SwitchWeaponClientRpc(int id = 0)
+    {
+        SwitchToWeaponBase(id);
+    }
+    [ServerRpc]
+    private void SwitchWeaponServerRpc(int id = 0)
+    {
+        SwitchWeaponClientRpc(id);
+    }
+
+    private void SwitchToWeaponBase(int id = 0)
     {
         for (int i = 0; i < weaponTypes.Count; i++)
         {
@@ -43,6 +68,12 @@ public class WeaponSwitcher : NetworkBehaviour
         weaponTypes[id].visualsToShow.SetActive(true);
         shooter.muzzle = weaponTypes[id].muzzleFlash;
         shooter.timeBetweenShots = weapon.timeBetweenShots;
+        shooter.randomSpread = weapon.randomSpread;
+        shooter.pelletsPerShot = weapon.pelletsPerShot;
+        shooter.damage = weapon.damage;
+        shooter.projectile = weapon.projectile;
+        shooter.force = weapon.force;
+        shooter.inheritMomentum = weapon.inheritMomentum;
     }
     private void HideWeapon(int id)
     { 

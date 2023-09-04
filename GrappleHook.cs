@@ -73,8 +73,11 @@ public class GrappleHook : NetworkBehaviour
     [SerializeField] private LineRenderer line;
     private void DrawRope()
     {
-        line.SetPosition(0, grappleHand.position);
-        line.SetPosition(1, grapplePoint);
+        if (line.positionCount >= 2)
+        { 
+            line.SetPosition(0, grappleHand.position);
+            line.SetPosition(1, grapplePoint);
+        }
     }
     [SerializeField] private Vector3 grapplePoint;
     [SerializeField] private Transform grappleOrigin;

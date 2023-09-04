@@ -15,8 +15,11 @@ public class BasicShoot : NetworkBehaviour
 
     private float weaponTimer;
     public float timeBetweenShots = 0.1f; //can only fire if weapon timer is greater than time between shots
-    [SerializeField] private Projectile projectile;
+    public float randomSpread = 0;
+    public int pelletsPerShot = 1;
+    [SerializeField] public Projectile projectile;
     [SerializeField] private Rigidbody body;
+    public int damage = 1;
     private void Start()
     {
         weaponTimer = timeBetweenShots;
@@ -107,40 +110,79 @@ public class BasicShoot : NetworkBehaviour
                 DealDamageUmbrella(bulletDamage, hurtbox);
             }
         }*/
+        //CreatePhysicsProjectile();
         ProjectileUmbrella();
     }
-    private void ProjectileUmbrella()
-    { 
-        ShootProjectile();
-        if (IsServer)
+    [SerializeField] private PhysicsProjectile grenade;
+    private void CreatePhysicsProjectile()
+    {
+        if (IsServer) //server can spawn it in
         {
-            ProjectileClientRpc(); //server tells clients about projectile
+            BaseCreatePhysicsProjectile();
         }
-        else
+        else //ask server to spawn it in
         {
-            ProjectileServerRpc();//ask server to tell clients
+            CreatePhysicsProjectileServerRpc();
         }
     }
-    [ClientRpc]
-    private void ProjectileClientRpc()
+    private void BaseCreatePhysicsProjectile()
+    { 
+        PhysicsProjectile phys = Instantiate(grenade, muzzle.transform.position, Quaternion.identity);
+        phys.NetworkObject.Spawn();
+        phys.body.velocity = body.velocity;
+        Vector3 dir = transform.forward; //+ new Vector3(Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread)); 
+        phys.transform.rotation = Quaternion.LookRotation(dir, transform.up);
+        phys.body.AddForce(dir * force, ForceMode.Impulse);
+    }
+    [ServerRpc]
+    private void CreatePhysicsProjectileServerRpc()
     {
+        if (IsServer) //server can spawn it in
+        {
+            BaseCreatePhysicsProjectile();
+        }
+    } 
+    private void ProjectileUmbrella()
+    {
+        for (int i = 0; i < pelletsPerShot; i++)
+        {
+            Vector3 randomOffset = new Vector3(Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread));
+            ShootProjectile(IsServer, randomOffset); //server has the "real" (damaging) projectile
+            if (IsServer)
+            {
+                ProjectileClientRpc(randomOffset); //server tells clients about projectile
+            }
+            else
+            {
+                ProjectileServerRpc(randomOffset);//ask server to tell clients
+            }
+        } 
+    }
+    [ClientRpc]
+    private void ProjectileClientRpc(Vector3 randomOffset)
+    { 
         if (!IsOwner)
         {
-            ShootProjectile();
+            ShootProjectile(IsServer, randomOffset);
         }
     }
     [ServerRpc]
-    private void ProjectileServerRpc()
+    private void ProjectileServerRpc(Vector3 randomOffset)
     {
-        ProjectileClientRpc();
+        ProjectileClientRpc(randomOffset);
     }
     [SerializeField] private WeaponSwitcher switcher;
-    private void ShootProjectile()
-    { 
+    public float force = 10;
+    public bool inheritMomentum = false;
+    private void ShootProjectile(bool real, Vector3 randomOffset)  
+    {
         Projectile proj = Instantiate(projectile, muzzle.transform.position, Quaternion.identity);
-        proj.transform.rotation = transform.rotation;
-        //proj.body.velocity = body.velocity;
-        proj.body.AddForce(transform.forward * 10, ForceMode.Impulse);
-        
+        proj.damage = damage;
+
+        if (inheritMomentum) proj.body.velocity = body.velocity;
+        Vector3 dir = transform.forward + randomOffset;
+        proj.transform.rotation = Quaternion.LookRotation(dir, transform.up);
+        proj.body.AddForce(dir * force, ForceMode.Impulse);
+        proj.real = real;
     }
 }
