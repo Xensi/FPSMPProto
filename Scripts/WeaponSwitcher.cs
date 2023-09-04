@@ -7,13 +7,19 @@ public class WeaponSwitcher : NetworkBehaviour
 {
     public List<WeaponType> weaponTypes;
     [SerializeField] private BasicShoot shooter;
-    private void Start()
+    public NetworkVariable<int> equippedWeaponID = new NetworkVariable<int>();
+    private int shownID = 0;
+    public override void OnNetworkSpawn()
     {
-        SwitchToWeaponBase(0);
-    } 
+        if (IsServer)
+        {
+            equippedWeaponID.Value = 0;
+        }
+        SwitchToWeaponBase(equippedWeaponID.Value);
+    }
     void Update()
 	{
-        if (IsOwner)
+        if (IsOwner) //client can press a number to instantly switch to different weapon
         {
             if (Input.inputString != "")
             {
@@ -21,35 +27,40 @@ public class WeaponSwitcher : NetworkBehaviour
                 bool is_a_number = Int32.TryParse(Input.inputString, out number);
                 if (is_a_number && number >= 0 && number < 10)
                 {
-                    SwitchWeaponUmbrella(number - 1);
+                    ClientSideSwitchWeapons(number - 1);
                 }
             }
-        } 
+        }
+        else
+        {
+            if (shownID != equippedWeaponID.Value) //if what is shown is different than actual, fix that
+            {
+                shownID = equippedWeaponID.Value;
+                ClientSideSwitchWeapons(shownID);
+            }
+        }
     }
-    private void SwitchWeaponUmbrella(int id = 0)
+    private void ClientSideSwitchWeapons(int id = 0)
     {
+        SwitchToWeaponBase(id);
+        //tell server which weapon we're using
         if (IsServer)
         {
-            SwitchWeaponClientRpc(id);
+            equippedWeaponID.Value = id; 
         }
         else
         {
             SwitchWeaponServerRpc(id);
         }
     }
-    [ClientRpc]
-    private void SwitchWeaponClientRpc(int id = 0)
-    {
-        SwitchToWeaponBase(id);
-    }
-    [ServerRpc]
+    [ServerRpc (RequireOwnership = false)]
     private void SwitchWeaponServerRpc(int id = 0)
     {
-        SwitchWeaponClientRpc(id);
+        equippedWeaponID.Value = id; 
     }
-
     private void SwitchToWeaponBase(int id = 0)
     {
+        shownID = id;
         for (int i = 0; i < weaponTypes.Count; i++)
         {
             if (i == id)
@@ -76,9 +87,9 @@ public class WeaponSwitcher : NetworkBehaviour
         shooter.inheritMomentum = weapon.inheritMomentum;
     }
     private void HideWeapon(int id)
-    { 
+    {
         weaponTypes[id].visualsToShow.SetActive(false);
-    }
+    } 
 }
 
 [Serializable]

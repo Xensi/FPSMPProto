@@ -91,7 +91,7 @@ public class Projectile : NetworkBehaviour
             BaseExplode();
         }
     }
-    [ServerRpc]
+    [ServerRpc (RequireOwnership = false)]
     private void ExplodeServerRpc()
     {
         ExplodeClientRpc();

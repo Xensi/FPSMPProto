@@ -962,7 +962,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6058440044722862678
 Transform:
   m_ObjectHideFlags: 0
@@ -1258,7 +1258,6 @@ MonoBehaviour:
   - {fileID: 6358525248013056049}
   - {fileID: 511227989131902766}
   - {fileID: 6705830122864838369}
-  - {fileID: 6561933035523379178}
 --- !u!81 &511227989131902766
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1403,7 +1402,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5093113218634472095
 Transform:
   m_ObjectHideFlags: 0
@@ -1997,6 +1996,8 @@ MonoBehaviour:
     visualsToShow: {fileID: 7097739596947227938}
     muzzleFlash: {fileID: 6597803697226121670}
   shooter: {fileID: 2388376419523812764}
+  equippedWeaponID:
+    m_InternalValue: 0
 --- !u!1 &8745608740838929037
 GameObject:
   m_ObjectHideFlags: 0

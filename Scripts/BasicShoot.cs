@@ -179,7 +179,7 @@ public class BasicShoot : NetworkBehaviour
         Projectile proj = Instantiate(projectile, muzzle.transform.position, Quaternion.identity);
         proj.damage = damage;
 
-        if (inheritMomentum) proj.body.velocity = body.velocity;
+        //if (inheritMomentum) proj.body.velocity = body.velocity; //this doesn't work because body.velocity is not universal, must be communicated
         Vector3 dir = transform.forward + randomOffset;
         proj.transform.rotation = Quaternion.LookRotation(dir, transform.up);
         proj.body.AddForce(dir * force, ForceMode.Impulse);

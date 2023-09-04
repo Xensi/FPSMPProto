@@ -106,7 +106,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: fuseTime
-      value: 1
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: stopOnImpact
