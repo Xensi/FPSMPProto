@@ -25,7 +25,12 @@ public class Hurtbox : NetworkBehaviour
         if (IsOwner)
         {
             player.transform.position = RespawnManager.Instance.respawnPoints[Random.Range(0, RespawnManager.Instance.respawnPoints.Count)].position;
-        } 
+            player.layer = 6; //set to 
+        }
+        else
+        {
+            player.layer = 7; //enemy
+        }
     }
     private void Update()
     {

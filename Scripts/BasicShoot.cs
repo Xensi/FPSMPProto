@@ -15,12 +15,15 @@ public class BasicShoot : NetworkBehaviour
 
     private float weaponTimer;
     public float timeBetweenShots = 0.1f; //can only fire if weapon timer is greater than time between shots
+    [SerializeField] private Projectile projectile;
     private void Start()
     {
         weaponTimer = timeBetweenShots;
     }
     private void Update()
     {
+        if (!IsOwner) return;
+
         if (weaponTimer < timeBetweenShots)
         {
             weaponTimer += Time.deltaTime;
@@ -92,15 +95,47 @@ public class BasicShoot : NetworkBehaviour
         
         Ray ray = new Ray(transform.position, shootDirection);
         RaycastHit hit; //otherwise, make raycast
-        Debug.DrawRay(transform.position, shootDirection, Color.red, 1);
-
-        if (Physics.Raycast(ray, out hit, range, canHitMask)) //if raycast hits something  
+                        //Debug.DrawRay(transform.position, shootDirection, Color.red, 1);
+        /*if (Physics.Raycast(ray, out hit, range, canHitMask)) //if raycast hits something  
         { 
             if (hit.collider.TryGetComponent(out Hurtbox hurtbox))
             {
                 DealDamageUmbrella(bulletDamage, hurtbox);
             }
+        }*/
+        ProjectileUmbrella();
+    }
+    private void ProjectileUmbrella()
+    { 
+        ShootProjectile();
+        if (IsServer)
+        {
+            ProjectileClientRpc(); //server tells clients about projectile
         }
+        else
+        {
+            ProjectileServerRpc();//ask server to tell clients
+        }
+    }
+    [ClientRpc]
+    private void ProjectileClientRpc()
+    {
+        if (!IsOwner)
+        {
+            ShootProjectile();
+        }
+    }
+    [ServerRpc]
+    private void ProjectileServerRpc()
+    {
+        ProjectileClientRpc();
+    }
+    [SerializeField] private WeaponSwitcher switcher;
+    private void ShootProjectile()
+    { 
+        Projectile proj = Instantiate(projectile, muzzle.transform.position, Quaternion.identity);
+        proj.transform.rotation = transform.rotation;
+        proj.body.AddForce(transform.forward * 10, ForceMode.Impulse);
     }
     private void DealDamageUmbrella(int damage, Hurtbox hurtbox)
     { 

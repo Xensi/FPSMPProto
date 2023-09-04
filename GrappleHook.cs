@@ -36,9 +36,9 @@ public class GrappleHook : MonoBehaviour
     [SerializeField] private float drawInSpeed = 1000;
     private void ShortenCable()
     {
-        Vector3 dir = grapplePoint.position - grappleOrigin.position;
+        Vector3 dir = grapplePoint - grappleOrigin.position;
         body.AddForce(dir.normalized * drawInSpeed * Time.deltaTime, ForceMode.Force);
-        float distFromPoint = Vector3.Distance(player.transform.position, grapplePoint.position);
+        float distFromPoint = Vector3.Distance(player.transform.position, grapplePoint);
 
         joint.maxDistance = distFromPoint * 0.8f;
         joint.minDistance = distFromPoint * .2f;
@@ -61,9 +61,9 @@ public class GrappleHook : MonoBehaviour
     private void DrawRope()
     {
         line.SetPosition(0, grappleHand.position);
-        line.SetPosition(1, grapplePoint.position);
+        line.SetPosition(1, grapplePoint);
     }
-    [SerializeField] private Transform grapplePoint;
+    [SerializeField] private Vector3 grapplePoint;
     [SerializeField] private Transform grappleOrigin;
     [SerializeField] private Transform grappleHand;
     private void Grapple()
@@ -71,7 +71,7 @@ public class GrappleHook : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(grappleOrigin.position, grappleOrigin.forward, out hit, grappleDistance, grappleMask)) //if raycast hits something  
         {
-            grapplePoint.position = hit.point;
+            grapplePoint = hit.point;
             joint = player.gameObject.AddComponent<SpringJoint>();
             joint.autoConfigureConnectedAnchor = false;
             joint.connectedAnchor = hit.point;
