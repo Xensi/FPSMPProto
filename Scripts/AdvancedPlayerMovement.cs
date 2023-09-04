@@ -44,7 +44,17 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     { 
         Cursor.lockState = CursorLockMode.Locked;
         moveSpeed = defaultSpeed;
-    } 
+    }
+    private void Update()
+    {
+        LookAround();
+        AngleAdjust();
+        CheckJumping();
+    }
+    void FixedUpdate()
+    {
+        Movement();
+    }
     private void LookAround()
     {
         // up and down synced, side to side not synced ???
@@ -57,21 +67,20 @@ public class AdvancedPlayerMovement : NetworkBehaviour
 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0); //rotate camera locally   
     } 
-    private void Update()
-    {
-        LookAround();
-        AngleAdjust();
-        CheckJumping(); 
-    }   
-    void FixedUpdate()
-    {
-        Movement(); 
-    } 
     private void AngleAdjust()
     {
         keepUpright.localRotation = Quaternion.Euler(-xRotation, 0, 0);
     }
     private float slideDownwardForce = 10;
+    void Movement()
+    {
+        Walk();
+        WallRunMovement();
+        UpdateDrag();
+        UpdateState();
+        UpdateAnimation();
+        //speed.text = "Speed: " + body.velocity.magnitude;
+    }
     private void Walk()
     {
         //try tying to camera angle?
@@ -100,15 +109,37 @@ public class AdvancedPlayerMovement : NetworkBehaviour
             }
         }
     }
-    void Movement()
+    private void WallRunMovement()
     {
-        Walk();
-        WallRunMovement();
-        UpdateDrag();
-        UpdateState();
-        UpdateAnimation();
-        //speed.text = "Speed: " + body.velocity.magnitude;
+        if ((playerMovementState == MovementStates.Wallrunning) && z > 0 & !isGrounded)
+        {
+
+            wallNormal = wallRight ? outRightHit.normal : outLeftHit.normal;
+            Vector3 wallForward = Vector3.Cross(wallNormal, keepUpright.up);
+
+            if ((keepUpright.forward - wallForward).magnitude > (keepUpright.forward + wallForward).magnitude)
+            {
+                wallForward = -wallForward;
+            }
+
+            body.AddForce(10 * moveSpeed * wallForward, ForceMode.Force);
+            if (!(wallLeft && x > 0) && !(wallRight && x < 0)) //stick on
+            {
+                //body.AddForce(-wallNormal * 100, ForceMode.Force); 
+                if (body.velocity.y <= 0)
+                {
+                    body.useGravity = false;
+                    //body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
+                    body.AddForce(keepUpright.up * -9.81f * 0.75f, ForceMode.Force);
+                }
+            }
+        }
+        else
+        {
+            body.useGravity = true;
+        }
     }
+    [SerializeField] private GrappleHook grapple;
     private void UpdateDrag()
     {
         if (isGrounded)
@@ -118,12 +149,12 @@ public class AdvancedPlayerMovement : NetworkBehaviour
                 body.drag = .1f;
             }
             else
-            { 
+            {
                 body.drag = groundDrag;
             }
         }
         else if (playerMovementState == MovementStates.Wallrunning)
-        { 
+        {
             body.drag = groundDrag;
         }
         else
@@ -216,34 +247,5 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     {
         Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
         Debug.DrawRay(transform.position, transform.right * wallCheckDist, Color.white);
-    }
-    private void WallRunMovement()
-    {
-        if ((playerMovementState == MovementStates.Wallrunning) && z > 0 & !isGrounded)
-        {
-
-            wallNormal = wallRight ? outRightHit.normal : outLeftHit.normal;
-            Vector3 wallForward = Vector3.Cross(wallNormal, keepUpright.up);
-
-            if ((keepUpright.forward - wallForward).magnitude > (keepUpright.forward + wallForward).magnitude){
-                wallForward = -wallForward;
-            }
-             
-            body.AddForce(10 * moveSpeed * wallForward, ForceMode.Force);
-            if (!(wallLeft && x > 0) && !(wallRight && x < 0)) //stick on
-            {
-                //body.AddForce(-wallNormal * 100, ForceMode.Force); 
-                if (body.velocity.y <= 0)
-                {
-                    body.useGravity = false;
-                    //body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
-                    body.AddForce(keepUpright.up * -9.81f * 0.75f, ForceMode.Force);
-                }
-            } 
-        }
-        else
-        {
-            body.useGravity = true;
-        }
-    }
+    } 
 }

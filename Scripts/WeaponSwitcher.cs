@@ -7,11 +7,11 @@ public class WeaponSwitcher : NetworkBehaviour
 {
     public List<WeaponType> weaponTypes;
     [SerializeField] private BasicShoot shooter;
-    public NetworkVariable<int> equippedWeaponID = new NetworkVariable<int>();
+    public NetworkVariable<int> equippedWeaponID = new NetworkVariable<int>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private int shownID = 0;
     public override void OnNetworkSpawn()
     {
-        if (IsServer)
+        if (IsOwner)
         {
             equippedWeaponID.Value = 0;
         }
@@ -43,21 +43,8 @@ public class WeaponSwitcher : NetworkBehaviour
     private void ClientSideSwitchWeapons(int id = 0)
     {
         SwitchToWeaponBase(id);
-        //tell server which weapon we're using
-        if (IsServer)
-        {
-            equippedWeaponID.Value = id; 
-        }
-        else
-        {
-            SwitchWeaponServerRpc(id);
-        }
-    }
-    [ServerRpc (RequireOwnership = false)]
-    private void SwitchWeaponServerRpc(int id = 0)
-    {
         equippedWeaponID.Value = id; 
-    }
+    } 
     private void SwitchToWeaponBase(int id = 0)
     {
         shownID = id;

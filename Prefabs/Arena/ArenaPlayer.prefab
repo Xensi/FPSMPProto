@@ -184,7 +184,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
+  near clip plane: 0.05
   far clip plane: 1000
   field of view: 90
   orthographic: 0
@@ -562,7 +562,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2925671442232918446}
-  m_Material: {fileID: 13400000, guid: 8f96634076ee6fd4ab46beb650d64625, type: 2}
+  m_Material: {fileID: 13400000, guid: 759c8ffbdf6996744807b3183cfa33eb, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
@@ -708,7 +708,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
+  near clip plane: 0.05
   far clip plane: 1000
   field of view: 90
   orthographic: 0
@@ -1241,6 +1241,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 63
   keepUpright: {fileID: 8675860699166013642}
+  grapple: {fileID: 3487059211141002563}
 --- !u!114 &7072144441012091553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1824,11 +1825,14 @@ MonoBehaviour:
   grappleDistance: Infinity
   grappleMask:
     serializedVersion: 2
-    m_Bits: 2147483647
-  drawInSpeed: 5000
+    m_Bits: 63
+  joint: {fileID: 0}
+  drawInSpeed: 4000
+  shootOutSpeed: 50
+  grappleState: 0
   body: {fileID: 7656394865206341506}
   line: {fileID: 2052933602750102953}
-  grapplePoint: {x: 0, y: 0, z: 0}
+  drawGrapplePoint: {x: 0, y: 0, z: 0}
   grappleOrigin: {fileID: 8166756153796318332}
   grappleHand: {fileID: 2053761275618409969}
 --- !u!120 &2052933602750102953
