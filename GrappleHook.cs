@@ -2,8 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class GrappleHook : MonoBehaviour
+public class GrappleHook : NetworkBehaviour
 {
     [SerializeField] private GameObject player;
     [SerializeField] private float grappleDistance = Mathf.Infinity;
@@ -11,26 +12,44 @@ public class GrappleHook : MonoBehaviour
     private SpringJoint joint;
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (IsOwner)
         {
-            if (joint == null)
-            { 
-                Grapple();
-            } 
-        }
-        if (Input.GetKey(KeyCode.Q))
-        {
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                if (joint == null)
+                {
+                    Grapple();
+                }
+            }
+            if (Input.GetKey(KeyCode.Q))
+            {
+                if (joint != null)
+                {
+                    ShortenCable();
+                }
+            }
+            if (Input.GetKeyUp(KeyCode.Q))
+            {
+                if (joint != null)
+                {
+                    StopGrapple();
+                }
+            }
+        } 
+    }
+    
+    private void LateUpdate()
+    {
+        if (IsOwner)
+        { 
             if (joint != null)
             {
-                ShortenCable();
+                DrawRope();
             }
         }
-        if (Input.GetKeyUp(KeyCode.Q))
+        else
         {
-            if (joint != null)
-            {
-                StopGrapple();
-            }
+            if (serverDisplayGrapple) DrawRope();
         }
     }
     [SerializeField] private float drawInSpeed = 1000;
@@ -47,14 +66,8 @@ public class GrappleHook : MonoBehaviour
     private void StopGrapple()
     {
         line.positionCount = 0;
+        DisplayGrappleUmbrella(false, Vector3.zero);
         Destroy(joint);
-    }
-    private void LateUpdate()
-    {
-        if (joint != null)
-        { 
-            DrawRope();
-        }
     }
     [SerializeField] private Rigidbody body;
     [SerializeField] private LineRenderer line;
@@ -86,6 +99,46 @@ public class GrappleHook : MonoBehaviour
             joint.massScale = 4.5f;
 
             line.positionCount = 2;
+
+            DisplayGrappleUmbrella(true, hit.point);
         }
     }
+    private bool serverDisplayGrapple = false;
+    private void DisplayGrappleUmbrella(bool val, Vector3 point)
+    {
+        if (IsServer)
+        {
+            DisplayGrappleClientRpc(val, point);
+        }
+        else
+        {
+            DisplayGrappleServerRpc(val, point);
+        }
+    }
+    private void BaseDisplayGrapple(bool val, Vector3 point)
+    {
+        grapplePoint = point;
+        serverDisplayGrapple = val;
+        if (val)
+        {
+            line.positionCount = 2;
+        }
+        else
+        {
+            line.positionCount = 0;
+        }
+    }
+    [ClientRpc]
+    private void DisplayGrappleClientRpc(bool val, Vector3 point)
+    {
+        BaseDisplayGrapple(val, point);
+    }
+    [ServerRpc]
+    private void DisplayGrappleServerRpc(bool val, Vector3 point)
+    {
+        DisplayGrappleClientRpc(val, point);
+    }
+
+
+
 }

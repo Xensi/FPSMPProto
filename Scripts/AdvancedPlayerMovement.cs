@@ -71,6 +71,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     {
         keepUpright.localRotation = Quaternion.Euler(-xRotation, 0, 0);
     }
+    private float slideDownwardForce = 10;
     private void Walk()
     {
         //try tying to camera angle?
@@ -83,6 +84,10 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         {
             body.AddForce(10 * moveSpeed * moveDirection.normalized, ForceMode.Force);
         }
+        /*else if (isGrounded && playerMovementState == MovementStates.Sliding)
+        {
+            body.AddForce(10 * slideDownwardForce * -keepUpright.up, ForceMode.Force);
+        }*/
         else if (playerMovementState == MovementStates.Wallrunning)
         {
             if ((wallLeft && x < 0) || (wallRight && x > 0))
@@ -218,9 +223,9 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         {
 
             wallNormal = wallRight ? outRightHit.normal : outLeftHit.normal;
-            Vector3 wallForward = Vector3.Cross(wallNormal, transform.up);
+            Vector3 wallForward = Vector3.Cross(wallNormal, keepUpright.up);
 
-            if ((transform.forward - wallForward).magnitude > (transform.forward + wallForward).magnitude){
+            if ((keepUpright.forward - wallForward).magnitude > (keepUpright.forward + wallForward).magnitude){
                 wallForward = -wallForward;
             }
              
@@ -232,7 +237,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
                 {
                     body.useGravity = false;
                     //body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
-                    body.AddForce(transform.up * -9.81f / 2, ForceMode.Force);
+                    body.AddForce(keepUpright.up * -9.81f * 0.75f, ForceMode.Force);
                 }
             } 
         }

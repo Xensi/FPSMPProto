@@ -2,8 +2,8 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class WeaponSwitcher : MonoBehaviour
+using Unity.Netcode;
+public class WeaponSwitcher : NetworkBehaviour
 {
     public List<WeaponType> weaponTypes;
     [SerializeField] private BasicShoot shooter;

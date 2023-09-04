@@ -16,6 +16,7 @@ public class BasicShoot : NetworkBehaviour
     private float weaponTimer;
     public float timeBetweenShots = 0.1f; //can only fire if weapon timer is greater than time between shots
     [SerializeField] private Projectile projectile;
+    [SerializeField] private Rigidbody body;
     private void Start()
     {
         weaponTimer = timeBetweenShots;
@@ -47,15 +48,18 @@ public class BasicShoot : NetworkBehaviour
     }
     private void BaseGunCosmeticEffects()
     {
+        float pitchChange = 0.05f;
+        float pitch = Random.Range(1-pitchChange, 1+pitchChange);
         if (muzzle != null) muzzle.Play();
         if (jolt != null) jolt.FireJolt();
         if (IsOwner)
         {
+            source.pitch = pitch;
             source.PlayOneShot(source.clip);
         }
         else
-        { 
-            PlayClipAtPoint(source.clip, transform.position, 1);
+        {
+            PlayClipAtPoint(source.clip, transform.position, 1, pitch);
         }
     }
     [ServerRpc] //(RequireOwnership = false)
@@ -135,29 +139,8 @@ public class BasicShoot : NetworkBehaviour
     { 
         Projectile proj = Instantiate(projectile, muzzle.transform.position, Quaternion.identity);
         proj.transform.rotation = transform.rotation;
+        //proj.body.velocity = body.velocity;
         proj.body.AddForce(transform.forward * 10, ForceMode.Impulse);
-    }
-    private void DealDamageUmbrella(int damage, Hurtbox hurtbox)
-    { 
-        if (IsServer) //server can write network variables
-        {
-            DealDamage(bulletDamage, hurtbox);
-        }
-        else //ask server to write network variable
-        {
-            DealDamageServerRpc(bulletDamage, hurtbox);
-        }
-    }
-    private void DealDamage(int damage, Hurtbox hurtbox)
-    { 
-        hurtbox.playerHP.Value -= damage;
-    }
-    [ServerRpc]
-    private void DealDamageServerRpc(int damage, NetworkBehaviourReference hurtbox)
-    {
-        if (hurtbox.TryGet(out Hurtbox hurt))
-        { 
-            DealDamage(damage, hurt);
-        }
+        
     }
 }

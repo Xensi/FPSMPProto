@@ -8,6 +8,7 @@ public class Hurtbox : NetworkBehaviour
     public NetworkVariable<int> playerHP = new NetworkVariable<int>();
     private const int initialHP = 5;
     [SerializeField] private GameObject player;
+    [SerializeField] private List<Transform> playerObjectsToChangeLayers; //assign visuals
     public override void OnNetworkSpawn()
     { 
         Respawn();
@@ -20,16 +21,28 @@ public class Hurtbox : NetworkBehaviour
         }
         SpawnRandom();
     }
+    void SetLayerAllChildren(Transform root, int layer)
+    {
+        var children = root.GetComponentsInChildren<Transform>(includeInactive: true);
+        foreach (var child in children)
+        {
+            Debug.Log(child.name);
+            child.gameObject.layer = layer;
+        }
+    }
     private void SpawnRandom()
     {
         if (IsOwner)
         {
-            player.transform.position = RespawnManager.Instance.respawnPoints[Random.Range(0, RespawnManager.Instance.respawnPoints.Count)].position;
-            player.layer = 6; //set to 
+            player.transform.position = RespawnManager.Instance.respawnPoints[Random.Range(0, RespawnManager.Instance.respawnPoints.Count)].position; 
         }
         else
         {
-            player.layer = 7; //enemy
+            player.layer = 7;
+            foreach (Transform item in playerObjectsToChangeLayers)
+            {
+                SetLayerAllChildren(item, 7);
+            }
         }
     }
     private void Update()
@@ -59,5 +72,26 @@ public class Hurtbox : NetworkBehaviour
     private void RespawnClientRpc(ClientRpcParams clientParams = default)
     {
         SpawnRandom();
+    }
+
+    public void DealDamageUmbrella(int damage)
+    {
+        if (IsServer) //server can write network variables
+        {
+            DealDamage(damage);
+        }
+        else //ask server to write network variable
+        {
+            DealDamageServerRpc(damage);
+        }
+    }
+    private void DealDamage(int damage)
+    {
+        playerHP.Value -= damage;
+    }
+    [ServerRpc (RequireOwnership = false)]
+    private void DealDamageServerRpc(int damage)
+    {
+        DealDamage(damage);
     }
 }
