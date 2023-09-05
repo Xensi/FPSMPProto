@@ -21,6 +21,11 @@ public class GrappleHook : NetworkBehaviour
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public NetworkVariable<Vector3> grappleTip = new NetworkVariable<Vector3>(default,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    [SerializeField] private Rigidbody body;
+    [SerializeField] private LineRenderer line;
+    [SerializeField] private Vector3 drawGrapplePoint;
+    [SerializeField] private Transform grappleOrigin;
+    [SerializeField] private Transform grappleHand;
     public enum GrappleStates
     {
         ReadyToFire, ShootingOut, PullingPlayer, Retracting
@@ -168,90 +173,5 @@ public class GrappleHook : NetworkBehaviour
 
         joint.maxDistance = distFromPoint * 0.8f;
         joint.minDistance = distFromPoint * .2f;
-    }
-     
-    private void LateUpdate()
-    {
-        /*if (IsOwner)
-        { 
-            if (joint != null)
-            {
-                DrawRope();
-            }
-        }
-        else
-        {
-            if (serverDisplayGrapple) DrawRope();
-        }*/
-    }
-    private void StopGrapple()
-    {
-        line.positionCount = 0;
-        DisplayGrappleUmbrella(false, Vector3.zero);
-        Destroy(joint);
-    }
-    [SerializeField] private Rigidbody body;
-    [SerializeField] private LineRenderer line;
-    [SerializeField] private Vector3 drawGrapplePoint;
-    [SerializeField] private Transform grappleOrigin;
-    [SerializeField] private Transform grappleHand;
-    private void Grapple()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(grappleOrigin.position, grappleOrigin.forward, out hit, grappleDistance, grappleMask)) //if raycast hits something  
-        {
-            drawGrapplePoint = hit.point;
-            joint = player.gameObject.AddComponent<SpringJoint>();
-            joint.autoConfigureConnectedAnchor = false;
-            joint.connectedAnchor = hit.point;
-
-            float distFromPoint = Vector3.Distance(player.transform.position, hit.point);
-
-            joint.maxDistance = distFromPoint * 0.8f;
-            joint.minDistance = distFromPoint * .2f;
-
-            joint.spring = 4.5f;
-            joint.damper = 7;
-            joint.massScale = 4.5f;
-
-            line.positionCount = 2;
-
-            DisplayGrappleUmbrella(true, hit.point);
-        }
-    }
-    private bool serverDisplayGrapple = false;
-    private void DisplayGrappleUmbrella(bool val, Vector3 point)
-    {
-        if (IsServer)
-        {
-            DisplayGrappleClientRpc(val, point);
-        }
-        else
-        {
-            DisplayGrappleServerRpc(val, point);
-        }
-    }
-    private void BaseDisplayGrapple(bool val, Vector3 point)
-    {
-        drawGrapplePoint = point;
-        serverDisplayGrapple = val;
-        if (val)
-        {
-            line.positionCount = 2;
-        }
-        else
-        {
-            line.positionCount = 0;
-        }
-    }
-    [ClientRpc]
-    private void DisplayGrappleClientRpc(bool val, Vector3 point)
-    {
-        BaseDisplayGrapple(val, point);
-    }
-    [ServerRpc]
-    private void DisplayGrappleServerRpc(bool val, Vector3 point)
-    {
-        DisplayGrappleClientRpc(val, point);
-    } 
+    }  
 }

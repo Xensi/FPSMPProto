@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Auto
   m_EditorClassIdentifier: 
   timeBetweenShots: 0.125
-  gunSound: {fileID: 0}
+  gunSound: {fileID: 8300000, guid: a9549b817da048b43a7e338e34b7883f, type: 3}
   randomSpread: 0.02
   pelletsPerShot: 1
   damage: 20
   projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
   force: 10
+  inheritMomentum: 0
+  thrown: 0

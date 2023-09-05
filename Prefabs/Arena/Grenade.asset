@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Grenade
   m_EditorClassIdentifier: 
   timeBetweenShots: 1
-  gunSound: {fileID: 0}
+  gunSound: {fileID: 8300000, guid: 6d27a72fea0efeb46b87677c3dce3a56, type: 3}
   randomSpread: 0
   pelletsPerShot: 1
   damage: 100
   projectile: {fileID: 8841976647714836687, guid: 5ea5af2f9e75f8847a4cbacfa44f7870, type: 3}
-  force: 5
+  force: 3
   inheritMomentum: 1
+  thrown: 1

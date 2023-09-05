@@ -11,25 +11,30 @@ public class Projectile : NetworkBehaviour
     public bool stopOnImpact = true;
     public bool explodeOnImpact = false;
     private int explosionDamage = 100;
-    [HideInInspector] public bool real = true;
+    public bool real = true;
     public ParticleSystem explosionEffect;
+    public ulong id = 0;
     private void OnCollisionEnter(Collision collision)
     {
         if (!damageDealt && fuseTime == -1)
         {
-            if (collision.gameObject.layer != 6 && collision.gameObject.layer != 9)
+            if (collision.collider.TryGetComponent(out Hurtbox hurtbox))
             {
-                damageDealt = true;
-                Debug.Log(collision.gameObject.name);
-                if (stopOnImpact) body.drag = Mathf.Infinity;
-
-                if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
-                { 
-                    if (collision.collider.TryGetComponent(out Hurtbox hurtbox))
+                if (hurtbox.OwnerClientId != id) //did not hit self
+                {
+                    damageDealt = true;
+                    if (stopOnImpact) body.drag = Mathf.Infinity;
+                    if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
                     {
+                        Debug.Log(collision.gameObject.name);
                         hurtbox.DealDamageUmbrella(damage);
                     }
                 }
+            }
+            else
+            {
+                damageDealt = true;
+                if (stopOnImpact) body.drag = Mathf.Infinity;
             }
         } 
     }

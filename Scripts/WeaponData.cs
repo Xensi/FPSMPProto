@@ -10,4 +10,5 @@ public class WeaponData : ScriptableObject
     public Projectile projectile;
     public float force = 10;
     public bool inheritMomentum = false;
+    public bool thrown = false;
 }

@@ -72,6 +72,8 @@ public class WeaponSwitcher : NetworkBehaviour
         shooter.projectile = weapon.projectile;
         shooter.force = weapon.force;
         shooter.inheritMomentum = weapon.inheritMomentum;
+        shooter.source.clip = weapon.gunSound;
+        shooter.thrown = weapon.thrown;
     }
     private void HideWeapon(int id)
     {

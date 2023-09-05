@@ -102,8 +102,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 513801960101879087}
+  - component: {fileID: 4032687657060552087}
   m_Layer: 8
-  m_Name: Animation
+  m_Name: MoveWeapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -125,6 +126,21 @@ Transform:
   m_Father: {fileID: 2131614782479823575}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4032687657060552087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896149469733748976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961b2fd57dbdcf146b7e32d03fdfab7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseTransform: {fileID: 6561818011470928170}
+  chargedTransform: {fileID: 6742891754388181126}
+  shoot: {fileID: 2388376419523812764}
 --- !u!1 &1031579343496326542
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,6 +603,7 @@ MonoBehaviour:
   playerObjectsToChangeLayers:
   - {fileID: 8172274587895367532}
   - {fileID: 2131614782479823575}
+  - {fileID: 8675860699166013642}
   body: {fileID: 7656394865206341506}
 --- !u!114 &4772223642025077102
 MonoBehaviour:
@@ -761,6 +778,37 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!1 &4252993821290005304
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6742891754388181126}
+  m_Layer: 6
+  m_Name: GrenadeCharged
+  m_TagString: Untagged
+  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6742891754388181126
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4252993821290005304}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.267, y: -0.3774, z: 0.4493}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3659943886436171259}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4259131392775028849
 GameObject:
   m_ObjectHideFlags: 0
@@ -962,7 +1010,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6058440044722862678
 Transform:
   m_ObjectHideFlags: 0
@@ -1403,7 +1451,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5093113218634472095
 Transform:
   m_ObjectHideFlags: 0
@@ -1479,7 +1527,9 @@ MonoBehaviour:
   projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
   body: {fileID: 7656394865206341506}
   damage: 1
-  grenade: {fileID: -1772879055424564182, guid: 49e077962fa7b404993f57697efd3649, type: 3}
+  chargedFloatCap: 1
+  chargedFloat: 0
+  thrown: 0
   switcher: {fileID: 6561933035523379178}
   force: 10
   inheritMomentum: 0
@@ -1829,12 +1879,16 @@ MonoBehaviour:
   joint: {fileID: 0}
   drawInSpeed: 4000
   shootOutSpeed: 50
-  grappleState: 0
+  drawGrapple:
+    m_InternalValue: 0
+  grappleTip:
+    m_InternalValue: {x: 0, y: 0, z: 0}
   body: {fileID: 7656394865206341506}
   line: {fileID: 2052933602750102953}
   drawGrapplePoint: {x: 0, y: 0, z: 0}
   grappleOrigin: {fileID: 8166756153796318332}
   grappleHand: {fileID: 2053761275618409969}
+  grappleState: 0
 --- !u!120 &2052933602750102953
 LineRenderer:
   serializedVersion: 2
@@ -2090,6 +2144,7 @@ Transform:
   - {fileID: 7406787363870160984}
   - {fileID: 2379932305176888274}
   - {fileID: 1997461112378579804}
+  - {fileID: 6742891754388181126}
   m_Father: {fileID: 1336251160477107444}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4076,6 +4131,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: grenade
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 18d1c85abd1a9e047a7c8d371a533184, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 18d1c85abd1a9e047a7c8d371a533184, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: 18d1c85abd1a9e047a7c8d371a533184, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 18d1c85abd1a9e047a7c8d371a533184, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -4094,15 +4161,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 18d1c85abd1a9e047a7c8d371a533184, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.0502
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 18d1c85abd1a9e047a7c8d371a533184, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 18d1c85abd1a9e047a7c8d371a533184, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.0817
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 18d1c85abd1a9e047a7c8d371a533184, type: 3}
       propertyPath: m_LocalRotation.w

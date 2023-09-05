@@ -104,6 +104,10 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.11
       objectReference: {fileID: 0}
+    - target: {fileID: 2136153870529764277, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 8c43730f6b77e0047a1c323463a37ac9, type: 2}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: fuseTime
       value: 1.25
@@ -120,6 +124,10 @@ PrefabInstance:
       propertyPath: explosionEffect
       value: 
       objectReference: {fileID: 7227745483280444750, guid: 8c10c985e4198a942837b0f5d380f29b, type: 3}
+    - target: {fileID: 3497340478110618072, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 951099334
+      objectReference: {fileID: 0}
     - target: {fileID: 4832102678065228670, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -179,28 +187,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4832102678065228670, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
   m_PrefabInstance: {fileID: 6617281778223235443}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &5875355839841793601 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 746537292371343154, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
-  m_PrefabInstance: {fileID: 6617281778223235443}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &-1537888488703216033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5875355839841793601}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
