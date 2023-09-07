@@ -47,6 +47,7 @@ public class WeaponSwitcher : NetworkBehaviour
     } 
     private void SwitchToWeaponBase(int id = 0)
     {
+        shooter.chargedFloat = 0;
         shownID = id;
         for (int i = 0; i < weaponTypes.Count; i++)
         {
