@@ -10,14 +10,14 @@ public class BasicShoot : NetworkBehaviour
     public AudioSource source;
     public ParticleSystem muzzle;
     [SerializeField] private Jolt jolt;
-    private float range = Mathf.Infinity;
-    private int bulletDamage = 1;
+    private readonly float range = Mathf.Infinity;
+    private readonly int bulletDamage = 1;
 
     private float weaponTimer;
     public float timeBetweenShots = 0.1f; //can only fire if weapon timer is greater than time between shots
     public float randomSpread = 0;
     public int pelletsPerShot = 1;
-    [SerializeField] public Projectile projectile;
+    public Projectile projectile;
     [SerializeField] private Rigidbody body;
     public int damage = 1;
     private void Start()

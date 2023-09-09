@@ -8,7 +8,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     [SerializeField] protected Animator animator;
     [SerializeField] protected TMP_Text speed;
     public Rigidbody body;
-    protected float jumpHeight = 40f;
+    [SerializeField] protected float jumpDistance = 40f;
     protected float defaultSpeed = 36f;
     protected float sprintMult = 1.3f;
     protected float groundRadius = 0.45f; //radius 
@@ -39,7 +39,9 @@ public class AdvancedPlayerMovement : NetworkBehaviour
 
     private float xRotation;
     private float yRotation;
-    [SerializeField] private Transform keepUpright;
+    [SerializeField] private Transform keepUpright; 
+    [SerializeField] private bool canWallRun = true;
+
     void Start()
     { 
         Cursor.lockState = CursorLockMode.Locked;
@@ -75,7 +77,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     void Movement()
     {
         Walk();
-        WallRunMovement();
+        if (canWallRun) WallRunMovement();
         UpdateDrag();
         UpdateState();
         UpdateAnimation();
@@ -138,8 +140,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         {
             body.useGravity = true;
         }
-    }
-    [SerializeField] private GrappleHook grapple;
+    } 
     private void UpdateDrag()
     {
         if (isGrounded)
@@ -179,13 +180,13 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private void WallRunJump()
     { 
         body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
-        body.AddForce(keepUpright.up * jumpHeight, ForceMode.Impulse);
-        body.AddForce(.75f * jumpHeight * wallNormal, ForceMode.Impulse);
+        body.AddForce(keepUpright.up * jumpDistance, ForceMode.Impulse);
+        body.AddForce(.75f * jumpDistance * wallNormal, ForceMode.Impulse);
     }
     private void Jump()
     { 
         body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
-        body.AddForce(keepUpright.up * jumpHeight, ForceMode.Impulse);
+        body.AddForce(keepUpright.up * jumpDistance, ForceMode.Impulse);
     }
     private void UpdateState()
     { 

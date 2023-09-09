@@ -1280,6 +1280,7 @@ MonoBehaviour:
   animator: {fileID: 2053761275609403919}
   speed: {fileID: 956177003965510770}
   body: {fileID: 7656394865206341506}
+  jumpDistance: 40
   groundCheck: {fileID: 1449962462117053268}
   groundMask:
     serializedVersion: 2
@@ -1289,7 +1290,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 63
   keepUpright: {fileID: 8675860699166013642}
-  grapple: {fileID: 3487059211141002563}
+  canWallRun: 1
 --- !u!114 &7072144441012091553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1302,7 +1303,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39007adfe95144c42adba593cc0059ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  components:
+  behaviours:
   - {fileID: 5192026574502567468}
   - {fileID: 6358525248013056049}
   - {fileID: 511227989131902766}
