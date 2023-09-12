@@ -79,7 +79,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControlled: 0
   weaponTypes:
-  - data: {fileID: 11400000, guid: cf472a5f4d16a2e4fa2c6b1bd1ec59e8, type: 2}
+  - data: {fileID: 11400000, guid: 8c4cdbc6a0d87ac4e8c8b36369ef6b3b, type: 2}
     visualsToShow: {fileID: 5776684374629639284}
     muzzleFlash: {fileID: 3502849501794503860}
     availableAmmo: 0

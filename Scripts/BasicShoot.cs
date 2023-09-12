@@ -15,12 +15,14 @@ public class BasicShoot : NetworkBehaviour
 
     private float weaponTimer;
     public float timeBetweenShots = 0.1f; //can only fire if weapon timer is greater than time between shots
-    public float randomSpread = 0;
+    public float spreadPerShot = 0.01f;
     public int pelletsPerShot = 1;
     public Projectile projectile;
     [SerializeField] private Rigidbody body; 
     public int damage = 1;
     public int ammoPerShot = 1;
+    public float maxSpread = .1f;
+    public float recoveryScale = 0.1f;
     private void Start()
     {
         weaponTimer = timeBetweenShots;
@@ -37,7 +39,11 @@ public class BasicShoot : NetworkBehaviour
         if (playerControlled)
         { 
             PlayerControl();
-        } 
+        }
+        if (accumulatedSpread > 0)
+        {
+            accumulatedSpread = Mathf.Clamp(accumulatedSpread -= Time.deltaTime * recoveryScale, 0, maxSpread);
+        }
     }
     private void PlayerControl()
     { 
@@ -158,14 +164,15 @@ public class BasicShoot : NetworkBehaviour
         }*/
     }
     public bool thrown = false;
+    private float accumulatedSpread = 0;
     private void ProjectileUmbrella(bool inheritVelocity = false)
     {
         for (int i = 0; i < pelletsPerShot; i++)
         {
             float charge = chargedFloat;
             Vector3 bodyVel = body.velocity;
-            Vector3 randomOffset = new(Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread));
-            
+            Vector3 randomOffset = new(Random.Range(-accumulatedSpread, accumulatedSpread), Random.Range(-accumulatedSpread, accumulatedSpread), Random.Range(-accumulatedSpread, accumulatedSpread));
+            accumulatedSpread += spreadPerShot;
             if (inheritVelocity)
             {
                 ShootProjectile(IsServer, randomOffset, bodyVel, charge); //server has the "real" (damaging) projectile

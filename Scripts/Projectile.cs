@@ -13,12 +13,13 @@ public class Projectile : NetworkBehaviour
     public bool real = true;
     public ParticleSystem explosionEffect;
     public ulong id = 0;
-    public bool firedByPlayer = true; 
+    public bool firedByPlayer = true;
+    [SerializeField] private GameObject bulletHole;
     private void OnCollisionEnter(Collision collision)
     {
         if (!damageDealt && fuseTime == -1)
         {
-            if (collision.collider.TryGetComponent(out Hurtbox hurtbox))
+            if (collision.collider.TryGetComponent(out Hurtbox hurtbox)) //effects on hitting something that can be damaged
             { 
                 if (hurtbox.playerControlled)
                 { 
@@ -38,10 +39,19 @@ public class Projectile : NetworkBehaviour
                         Debug.Log(collision.gameObject.name);
                         hurtbox.DealDamageUmbrella(damage);
                     }
-                }
+                } 
+            }
+            if (bulletHole != null)
+            {
+                 
+                ContactPoint contact = collision.GetContact(0);
+                Instantiate(bulletHole, transform.position, Quaternion.FromToRotation(Vector3.forward, -contact.normal));
 
-                
-            } 
+                /*GameObject hitParticleEffect = Instantiate(hitParticles, hit.point, Quaternion.FromToRotation(Vector3.up, hit.normal)); //create a particle effect on shot
+                    GameObject bulletHole = Instantiate(bulletImpact, hit.point, Quaternion.FromToRotation(Vector3.forward, hit.normal)); //create a bullet hole on shot
+                    hitParticleEffect.transform.SetParent(hit.transform); //connect to object that was hit
+                    bulletHole.transform.SetParent(hit.transform);*/
+            }
             damageDealt = true;
             if (stopOnImpact) body.drag = Mathf.Infinity;
             if (explodeOnImpact)

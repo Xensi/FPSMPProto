@@ -70,6 +70,9 @@ MonoBehaviour:
   explodeOnImpact: 0
   real: 1
   explosionEffect: {fileID: 0}
+  id: 0
+  firedByPlayer: 1
+  bulletHole: {fileID: 1463032851187077470, guid: 391f4dfeaf4c3424fbfb3c61e548563e, type: 3}
   explodeRadius: -1
 --- !u!54 &1551827702973853363
 Rigidbody:

@@ -101,7 +101,7 @@ public class WeaponSwitcher : NetworkBehaviour
         weaponTypes[id].visualsToShow.SetActive(true);
         shooter.muzzle = weaponTypes[id].muzzleFlash;
         shooter.timeBetweenShots = weapon.timeBetweenShots;
-        shooter.randomSpread = weapon.randomSpread;
+        shooter.spreadPerShot = weapon.spreadPerShot;
         shooter.pelletsPerShot = weapon.pelletsPerShot;
         shooter.damage = weapon.damage;
         shooter.projectile = weapon.projectile;
@@ -110,6 +110,8 @@ public class WeaponSwitcher : NetworkBehaviour
         shooter.source.clip = weapon.gunSound;
         shooter.thrown = weapon.thrown;
         shooter.ammoPerShot = weapon.ammoPerShot;
+        shooter.maxSpread = weapon.maxSpread;
+        shooter.recoveryScale = weapon.recoveryScale;
         if (playerControlled)
         { 
             gunText.text = weapon.name;

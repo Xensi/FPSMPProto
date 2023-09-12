@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db33296f778c2584fa72bd8fb98f6d79, type: 3}
   m_Name: Garand
   m_EditorClassIdentifier: 
-  timeBetweenShots: 0.125
+  timeBetweenShots: 0.1
   gunSound: {fileID: 8300000, guid: 9723b0ab07dcb8545b762e1c8a2fc64d, type: 3}
-  randomSpread: 0.02
+  spreadPerShot: 0.025
+  maxSpread: 0.075
+  recoveryScale: 0.1
   pelletsPerShot: 1
-  damage: 20
-  projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
-  force: 10
+  damage: 100
+  projectile: {fileID: 2405006166133232060, guid: 90ec577d499484348b300a5540a436cf, type: 3}
+  force: 1
   inheritMomentum: 0
   thrown: 0
-  startingAmmo: 30
+  startingAmmo: 999
   ammoPerShot: 1
