@@ -11,4 +11,6 @@ public class WeaponData : ScriptableObject
     public float force = 10;
     public bool inheritMomentum = false;
     public bool thrown = false;
+    public int startingAmmo = 30;
+    public int ammoPerShot = 1;
 }

@@ -9,32 +9,44 @@ public class Projectile : NetworkBehaviour
     [HideInInspector] public int damage = 1;
     public float fuseTime = -1;
     public bool stopOnImpact = true;
-    public bool explodeOnImpact = false;
-    private int explosionDamage = 100;
+    public bool explodeOnImpact = false; 
     public bool real = true;
     public ParticleSystem explosionEffect;
     public ulong id = 0;
+    public bool firedByPlayer = true; 
     private void OnCollisionEnter(Collision collision)
     {
         if (!damageDealt && fuseTime == -1)
         {
             if (collision.collider.TryGetComponent(out Hurtbox hurtbox))
-            {
-                if (hurtbox.OwnerClientId != id) //did not hit self
+            { 
+                if (hurtbox.playerControlled)
+                { 
+                    if (firedByPlayer && hurtbox.OwnerClientId != id || !firedByPlayer) //either a player hit another player that isn't themselves, or it was fired by an ai
+                    {
+                        if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
+                        {
+                            Debug.Log(collision.gameObject.name);
+                            hurtbox.DealDamageUmbrella(damage);
+                        }
+                    }
+                }
+                else
                 {
-                    damageDealt = true;
-                    if (stopOnImpact) body.drag = Mathf.Infinity;
                     if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
                     {
                         Debug.Log(collision.gameObject.name);
                         hurtbox.DealDamageUmbrella(damage);
                     }
                 }
-            }
-            else
+
+                
+            } 
+            damageDealt = true;
+            if (stopOnImpact) body.drag = Mathf.Infinity;
+            if (explodeOnImpact)
             {
-                damageDealt = true;
-                if (stopOnImpact) body.drag = Mathf.Infinity;
+                ExplodeUmbrella();
             }
         } 
     }
@@ -50,7 +62,7 @@ public class Projectile : NetworkBehaviour
         }
     }
     private void ExplodeUmbrella()
-    {
+    { 
         if (IsServer)
         {
             ExplodeClientRpc();

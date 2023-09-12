@@ -5,22 +5,32 @@ using Unity.Netcode;
 public class SpawnSoldier : NetworkBehaviour
 {
     [SerializeField] private AISoldier soldierPrefab;
+    public List<AISoldier> ownedSoldiers;
 
     private void Update()
     {
-#if UNITY_EDITOR
         if (Input.GetMouseButtonDown(2))
         {
             SpawnSoldierUmbrella();
         }
-#endif
+        if (Input.GetMouseButtonDown(1))
+        {
+            CommandSoldiers();
+        }
+    }
+    private void CommandSoldiers()
+    {
+        foreach (AISoldier item in ownedSoldiers)
+        {
+            item.target = transform.position;
+        }
     }
     private void SpawnSoldierUmbrella() 
     { //only server can spawn
         if (IsServer)
         {
             AISoldier soldier = Instantiate(soldierPrefab, transform.position, Quaternion.identity);
-            soldier.netObj.SpawnWithOwnership(OwnerClientId);
+            soldier.netObj.SpawnWithOwnership(OwnerClientId); 
         }
         else
         {
@@ -39,7 +49,8 @@ public class SpawnSoldier : NetworkBehaviour
         var clientId = serverRpcParams.Receive.SenderClientId;
         if (NetworkManager.ConnectedClients.ContainsKey(clientId))
         {
-            soldier.netObj.SpawnWithOwnership(clientId);
+            soldier.netObj.SpawnWithOwnership(clientId); 
         }
-    } 
+        //server puts new soldier in client's list
+    }  
 }

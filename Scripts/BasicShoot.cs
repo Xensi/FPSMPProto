@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 public class BasicShoot : NetworkBehaviour
 {
-    [SerializeField] private WeaponData equippedWeapon;
+    public bool playerControlled = true;
     [SerializeField] private LayerMask canHitMask;
     public AudioSource source;
     public ParticleSystem muzzle;
@@ -18,8 +18,9 @@ public class BasicShoot : NetworkBehaviour
     public float randomSpread = 0;
     public int pelletsPerShot = 1;
     public Projectile projectile;
-    [SerializeField] private Rigidbody body;
+    [SerializeField] private Rigidbody body; 
     public int damage = 1;
+    public int ammoPerShot = 1;
     private void Start()
     {
         weaponTimer = timeBetweenShots;
@@ -33,6 +34,13 @@ public class BasicShoot : NetworkBehaviour
         {
             weaponTimer += Time.deltaTime;
         }
+        if (playerControlled)
+        { 
+            PlayerControl();
+        } 
+    }
+    private void PlayerControl()
+    { 
         if (Input.GetMouseButtonDown(0))
         {
             if (thrown)
@@ -42,34 +50,40 @@ public class BasicShoot : NetworkBehaviour
         }
         if (Input.GetMouseButton(0))
         {
-            if (thrown && weaponTimer >= timeBetweenShots)
+            if (thrown && weaponTimer >= timeBetweenShots && switcher.activeWeaponType.availableAmmo > 0)
             {
                 chargedFloat += Time.deltaTime;
                 chargedFloat = Mathf.Clamp(chargedFloat, 0, chargedFloatCap);
             }
             else
-            { 
-                if (weaponTimer >= timeBetweenShots)
+            {
+                if (weaponTimer >= timeBetweenShots && switcher.activeWeaponType.availableAmmo > 0)
                 {
                     weaponTimer = 0;
                     ClientShoot();
-                    ShowGunCosmeticEffects();
                 }
-            } 
+            }
         }
         if (Input.GetMouseButtonUp(0))
         {
             if (thrown)
-            { 
-                if (weaponTimer >= timeBetweenShots)
+            {
+                if (weaponTimer >= timeBetweenShots && switcher.activeWeaponType.availableAmmo > 0)
                 {
                     weaponTimer = 0;
                     ClientShoot();
-                    ShowGunCosmeticEffects();
                 }
                 chargedFloat = 0;
             }
         }
+    }
+    public void AIShoot()
+    { 
+        if (weaponTimer >= timeBetweenShots && switcher.activeWeaponType.availableAmmo > 0)
+        {
+            weaponTimer = 0;
+            ClientShoot();
+        } 
     }
     public float chargedFloat = 0;
     public void ShowGunCosmeticEffects(byte id = 0)
@@ -128,9 +142,10 @@ public class BasicShoot : NetworkBehaviour
     }
     private void ClientShoot() //shoot raycast at target client side
     {
+        switcher.SubtractAmmo(ammoPerShot);
         ProjectileUmbrella(inheritMomentum);
-        /*Vector3 shootDirection = transform.forward;
-        
+        ShowGunCosmeticEffects();
+        /*Vector3 shootDirection = transform.forward; 
         Ray ray = new Ray(transform.position, shootDirection);
         RaycastHit hit; //otherwise, make raycast */
         //Debug.DrawRay(transform.position, shootDirection, Color.red, 1);
@@ -149,7 +164,7 @@ public class BasicShoot : NetworkBehaviour
         {
             float charge = chargedFloat;
             Vector3 bodyVel = body.velocity;
-            Vector3 randomOffset = new Vector3(Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread));
+            Vector3 randomOffset = new(Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread), Random.Range(-randomSpread, randomSpread));
             
             if (inheritVelocity)
             {
@@ -217,5 +232,6 @@ public class BasicShoot : NetworkBehaviour
         proj.body.AddForce(dir * (force + charge * force), ForceMode.Impulse);
         proj.real = real;
         proj.id = OwnerClientId;
+        proj.firedByPlayer = playerControlled; 
     }
 }

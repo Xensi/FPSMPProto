@@ -5,11 +5,11 @@ using Unity.Netcode;
 //not disabled per player: exists all the time
 public class Hurtbox : NetworkBehaviour
 {
-    public NetworkVariable<int> playerHP = new NetworkVariable<int>();
+    public bool playerControlled = true;
+    public NetworkVariable<int> HP = new();
     private const int initialHP = 100;
     [SerializeField] private GameObject player;
-    [SerializeField] private List<Transform> playerObjectsToChangeLayers; //assign visuals
-    [SerializeField] private Rigidbody body; 
+    [SerializeField] private List<Transform> playerObjectsToChangeLayers; //assign visuals 
     public override void OnNetworkSpawn()
     { 
         Respawn();
@@ -18,9 +18,12 @@ public class Hurtbox : NetworkBehaviour
     {
         if (IsServer)
         {
-            playerHP.Value = initialHP;
+            HP.Value = initialHP;
         }
-        SpawnRandom();
+        if (playerControlled)
+        { 
+            SpawnRandom();
+        }
     }
     void SetLayerAllChildren(Transform root, int layer)
     {
@@ -50,16 +53,30 @@ public class Hurtbox : NetworkBehaviour
     {
         if (IsServer)
         { 
-            CheckIfDead();
+            if (playerControlled)
+            { 
+                PlayerCheckIfDead();
+            }
+            else
+            {
+                AICheckIfDead();
+            }
         }
     }
-    private void CheckIfDead()
+    private void AICheckIfDead()
     {
-        if (playerHP.Value <= 0)
+        if (HP.Value <= 0)
+        {
+            Destroy(player.gameObject);
+        }
+    }
+    private void PlayerCheckIfDead()
+    {
+        if (HP.Value <= 0)
         { 
-            playerHP.Value = initialHP;
+            HP.Value = initialHP;
             
-            ClientRpcParams clientRpcParams = new ClientRpcParams
+            ClientRpcParams clientRpcParams = new()
             {
                 Send = new ClientRpcSendParams
                 {
@@ -88,7 +105,7 @@ public class Hurtbox : NetworkBehaviour
     }
     private void DealDamage(int damage)
     {
-        playerHP.Value -= damage;
+        HP.Value -= damage;
     }
     [ServerRpc (RequireOwnership = false)]
     private void DealDamageServerRpc(int damage)

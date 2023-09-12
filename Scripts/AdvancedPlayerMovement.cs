@@ -72,8 +72,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private void AngleAdjust()
     {
         keepUpright.localRotation = Quaternion.Euler(-xRotation, 0, 0);
-    }
-    private float slideDownwardForce = 10;
+    } 
     void Movement()
     {
         Walk();
@@ -132,7 +131,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
                 {
                     body.useGravity = false;
                     //body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
-                    body.AddForce(keepUpright.up * -9.81f * 0.75f, ForceMode.Force);
+                    body.AddForce(0.75f * -9.81f * keepUpright.up, ForceMode.Force);
                 }
             }
         }

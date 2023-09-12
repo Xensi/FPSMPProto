@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db33296f778c2584fa72bd8fb98f6d79, type: 3}
-  m_Name: Uzi
+  m_Name: RPG
   m_EditorClassIdentifier: 
-  timeBetweenShots: 0.1
-  gunSound: {fileID: 8300000, guid: a9549b817da048b43a7e338e34b7883f, type: 3}
-  randomSpread: 0.04
+  timeBetweenShots: 1
+  gunSound: {fileID: 8300000, guid: 421b860a7b03c934d913eabe6c7e9620, type: 3}
+  randomSpread: 0.05
   pelletsPerShot: 1
-  damage: 10
-  projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
-  force: 10
+  damage: 100
+  projectile: {fileID: 8841976647714836687, guid: 79be6bbd6e3caed49a3d4a2b204ff079, type: 3}
+  force: 20
   inheritMomentum: 0
   thrown: 0
+  startingAmmo: 10
+  ammoPerShot: 1

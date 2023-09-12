@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db33296f778c2584fa72bd8fb98f6d79, type: 3}
-  m_Name: Shotgun
+  m_Name: Grenade
   m_EditorClassIdentifier: 
-  timeBetweenShots: 1
-  gunSound: {fileID: 8300000, guid: a9549b817da048b43a7e338e34b7883f, type: 3}
-  randomSpread: 0.1
-  pelletsPerShot: 12
-  damage: 10
-  projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
-  force: 10
-  inheritMomentum: 0
-  thrown: 0
+  timeBetweenShots: 0.75
+  gunSound: {fileID: 8300000, guid: 6d27a72fea0efeb46b87677c3dce3a56, type: 3}
+  randomSpread: 0
+  pelletsPerShot: 1
+  damage: 100
+  projectile: {fileID: 8841976647714836687, guid: 5ea5af2f9e75f8847a4cbacfa44f7870, type: 3}
+  force: 3
+  inheritMomentum: 1
+  thrown: 1
+  startingAmmo: 100
+  ammoPerShot: 1
