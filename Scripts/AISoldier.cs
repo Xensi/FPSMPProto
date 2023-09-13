@@ -33,7 +33,19 @@ public class AISoldier : NetworkBehaviour
         { 
 			SoldierStorage.Instance.enemySoldiers.Add(this);
 		}
+		SetLayers();
 	}
+	private void SetLayers()
+    {
+		if (IsOwner)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
 	[SerializeField] private Transform eyes;
 	public Collider focusEnemy;
 	[SerializeField] private float rotationSpeed = 10;

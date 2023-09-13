@@ -53,18 +53,20 @@ MonoBehaviour:
   muzzle: {fileID: 3502849501794503860}
   jolt: {fileID: 2076377723176335225}
   timeBetweenShots: 0.1
-  randomSpread: 0
+  spreadPerShot: 0.01
   pelletsPerShot: 1
   projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
   body: {fileID: 5594070840530415669}
   damage: 1
   ammoPerShot: 1
-  chargedFloatCap: 1
-  chargedFloat: 0
+  maxSpread: 0.1
+  recoveryScale: 0.1
   thrown: 0
   switcher: {fileID: 1905458914979944401}
   force: 10
   inheritMomentum: 0
+  chargedFloatCap: 1
+  chargedFloat: 0
 --- !u!114 &1905458914979944401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,6 +85,7 @@ MonoBehaviour:
     visualsToShow: {fileID: 5776684374629639284}
     muzzleFlash: {fileID: 3502849501794503860}
     availableAmmo: 0
+    spareAmmo: 0
   shooter: {fileID: 3911897495381879372}
   equippedWeaponID:
     m_InternalValue: 0
@@ -93,6 +96,9 @@ MonoBehaviour:
     visualsToShow: {fileID: 0}
     muzzleFlash: {fileID: 0}
     availableAmmo: 0
+    spareAmmo: 0
+  reloadTime: 1
+  source: {fileID: 873878615399630547}
 --- !u!1 &1717403270129495837
 GameObject:
   m_ObjectHideFlags: 0

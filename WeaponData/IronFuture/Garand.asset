@@ -14,14 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeBetweenShots: 0.1
   gunSound: {fileID: 8300000, guid: 9723b0ab07dcb8545b762e1c8a2fc64d, type: 3}
+  reloadSound: {fileID: 8300000, guid: 5f0ebcb646df79b4f9f155185357849a, type: 3}
   spreadPerShot: 0.025
   maxSpread: 0.075
   recoveryScale: 0.1
   pelletsPerShot: 1
-  damage: 100
+  damage: 50
   projectile: {fileID: 2405006166133232060, guid: 90ec577d499484348b300a5540a436cf, type: 3}
   force: 1
   inheritMomentum: 0
   thrown: 0
-  startingAmmo: 999
+  startingAmmo: 100
   ammoPerShot: 1
+  reloadTime: 1
+  magSize: 8

@@ -23,6 +23,12 @@ public class BasicShoot : NetworkBehaviour
     public int ammoPerShot = 1;
     public float maxSpread = .1f;
     public float recoveryScale = 0.1f;
+
+    public bool thrown = false;
+    private float accumulatedSpread = 0;
+    [SerializeField] private WeaponSwitcher switcher;
+    public float force = 10;
+    public bool inheritMomentum = false;  
     private void Start()
     {
         weaponTimer = timeBetweenShots;
@@ -82,7 +88,7 @@ public class BasicShoot : NetworkBehaviour
                 chargedFloat = 0;
             }
         }
-    }
+    } 
     public void AIShoot()
     { 
         if (weaponTimer >= timeBetweenShots && switcher.activeWeaponType.availableAmmo > 0)
@@ -163,8 +169,6 @@ public class BasicShoot : NetworkBehaviour
             }
         }*/
     }
-    public bool thrown = false;
-    private float accumulatedSpread = 0;
     private void ProjectileUmbrella(bool inheritVelocity = false)
     {
         for (int i = 0; i < pelletsPerShot; i++)
@@ -225,9 +229,6 @@ public class BasicShoot : NetworkBehaviour
     {
         ProjectileClientRpc(randomOffset);
     }
-    [SerializeField] private WeaponSwitcher switcher; 
-    public float force = 10;
-    public bool inheritMomentum = false;
     private void ShootProjectile(bool real, Vector3 randomOffset, Vector3 bodyVelocity = default, float charge = 0)  
     {
         Projectile proj = Instantiate(projectile, muzzle.transform.position, Quaternion.identity);

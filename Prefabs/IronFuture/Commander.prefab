@@ -1920,18 +1920,20 @@ MonoBehaviour:
   muzzle: {fileID: 2051146903480029519}
   jolt: {fileID: 6659065980424095273}
   timeBetweenShots: 0
-  randomSpread: 0
+  spreadPerShot: 0.01
   pelletsPerShot: 1
   projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
   body: {fileID: 7656394865206341506}
   damage: 1
   ammoPerShot: 1
-  chargedFloatCap: 1
-  chargedFloat: 0
+  maxSpread: 0.1
+  recoveryScale: 0.1
   thrown: 0
   switcher: {fileID: 6561933035523379178}
   force: 10
   inheritMomentum: 0
+  chargedFloatCap: 1
+  chargedFloat: 0
 --- !u!82 &9140588717393834509
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2136,30 +2138,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControlled: 1
   weaponTypes:
-  - data: {fileID: 11400000, guid: cf472a5f4d16a2e4fa2c6b1bd1ec59e8, type: 2}
-    visualsToShow: {fileID: 5892075209651797781}
-    muzzleFlash: {fileID: 2051146903480029519}
-    availableAmmo: 0
   - data: {fileID: 11400000, guid: 8c4cdbc6a0d87ac4e8c8b36369ef6b3b, type: 2}
     visualsToShow: {fileID: 5437855904979341710}
     muzzleFlash: {fileID: 6079706058908430735}
     availableAmmo: 0
+    spareAmmo: 0
+  - data: {fileID: 11400000, guid: cf472a5f4d16a2e4fa2c6b1bd1ec59e8, type: 2}
+    visualsToShow: {fileID: 5892075209651797781}
+    muzzleFlash: {fileID: 2051146903480029519}
+    availableAmmo: 0
+    spareAmmo: 0
   - data: {fileID: 11400000, guid: 36d1ee8c280f6114a953feec2c5e3e44, type: 2}
     visualsToShow: {fileID: 5663311986684535595}
     muzzleFlash: {fileID: 117427854847237351}
     availableAmmo: 0
+    spareAmmo: 0
   - data: {fileID: 11400000, guid: 1e681754cc1f7e44eabd9aba16cfd2d0, type: 2}
     visualsToShow: {fileID: 1791574091892070525}
     muzzleFlash: {fileID: 5631333000092434678}
     availableAmmo: 0
+    spareAmmo: 0
   - data: {fileID: 11400000, guid: 92a00d339afd88d40be18f5a52e12e54, type: 2}
     visualsToShow: {fileID: 4894409187779571294}
     muzzleFlash: {fileID: 1692187394671457096}
     availableAmmo: 0
+    spareAmmo: 0
   - data: {fileID: 11400000, guid: 0a6fe44ed450c374084b98dba828ac67, type: 2}
     visualsToShow: {fileID: 7097739596947227938}
     muzzleFlash: {fileID: 6597803697226121670}
     availableAmmo: 0
+    spareAmmo: 0
   shooter: {fileID: 2388376419523812764}
   equippedWeaponID:
     m_InternalValue: 0
@@ -2170,6 +2178,9 @@ MonoBehaviour:
     visualsToShow: {fileID: 0}
     muzzleFlash: {fileID: 0}
     availableAmmo: 0
+    spareAmmo: 0
+  reloadTime: 1
+  source: {fileID: 9140588717393834509}
 --- !u!1 &8167055465043853244
 GameObject:
   m_ObjectHideFlags: 0
