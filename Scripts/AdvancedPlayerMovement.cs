@@ -50,8 +50,11 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private void Update()
     {
         LookAround();
-        AngleAdjust();
         CheckJumping();
+    }
+    private void LateUpdate()
+    {
+        AngleAdjust(); 
     }
     void FixedUpdate()
     {
@@ -68,10 +71,13 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         xRotation = Mathf.Clamp(xRotation, -90, 90); //prevent over rotation
 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0); //rotate camera locally   
-    } 
+    }
+    [SerializeField] private Transform camJoltRef;
     private void AngleAdjust()
     {
-        keepUpright.localRotation = Quaternion.Euler(-xRotation, 0, 0);
+        //keepUpright.localRotation = Quaternion.Euler(-xRotation, 0, 0);
+        keepUpright.localRotation = Quaternion.Euler(-camJoltRef.rotation.eulerAngles.x, 0, 0); 
+        //keepUpright.rotation = 
     } 
     void Movement()
     {

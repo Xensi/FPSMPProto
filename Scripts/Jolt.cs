@@ -14,8 +14,8 @@ public class Jolt : MonoBehaviour
     public float joltX = -2; //up/down rotation
     public float joltY = 2;
     public float joltZ = 0.35f;
-    public float joltSnapSpeed = 6;
-    public float joltReturnSpeed = 100f;  
+    public float joltSnapSpeed = 6; //speed at which moves to new position
+    public float joltReturnSpeed = 100f; //speed at which returns to base position
     private void Update()
     {
         targetRotation = Vector3.Lerp(targetRotation, Vector3.zero, joltReturnSpeed * Time.deltaTime);

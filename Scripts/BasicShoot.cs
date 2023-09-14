@@ -9,7 +9,7 @@ public class BasicShoot : NetworkBehaviour
     [SerializeField] private LayerMask canHitMask;
     public AudioSource source;
     public ParticleSystem muzzle;
-    [SerializeField] private Jolt jolt;
+    public Jolt jolt;
     private readonly float range = Mathf.Infinity;
     private readonly int bulletDamage = 1;
 
@@ -105,12 +105,14 @@ public class BasicShoot : NetworkBehaviour
         //request server to send to other clients
         ShowGunCosmeticEffectsServerRpc(id);
     }
+    [SerializeField] private Jolt camJolt;
     private void BaseGunCosmeticEffects()
     {
         float pitchChange = 0.05f;
         float pitch = Random.Range(1-pitchChange, 1+pitchChange);
         if (muzzle != null) muzzle.Play();
         if (jolt != null) jolt.FireJolt();
+        if (camJolt != null) camJolt.FireJolt();
         if (IsOwner)
         {
             source.pitch = pitch;

@@ -10,25 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db33296f778c2584fa72bd8fb98f6d79, type: 3}
-  m_Name: Garand
+  m_Name: Debug
   m_EditorClassIdentifier: 
   timeBetweenShots: 0.1
   gunSound: {fileID: 8300000, guid: 9723b0ab07dcb8545b762e1c8a2fc64d, type: 3}
   reloadSound: {fileID: 8300000, guid: 5f0ebcb646df79b4f9f155185357849a, type: 3}
-  spreadPerShot: 0.025
+  spreadPerShot: 0
   maxSpread: 0
   recoveryScale: 0.1
   pelletsPerShot: 1
   damage: 50
   projectile: {fileID: 2405006166133232060, guid: 90ec577d499484348b300a5540a436cf, type: 3}
-  force: 6.74308
+  force: 3
   inheritMomentum: 0
   thrown: 0
   startingAmmo: 100
   ammoPerShot: 1
   reloadTime: 1
-  magSize: 8
-  joltX: -25
-  joltY: 25
-  joltZ: 25
-  joltReturnSpeed: 50
+  magSize: 100
+  joltX: 0
+  joltY: 0
+  joltZ: 0
+  joltReturnSpeed: 0
