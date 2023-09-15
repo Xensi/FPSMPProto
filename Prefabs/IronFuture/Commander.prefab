@@ -208,7 +208,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 3839
+    m_Bits: 7935
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1891,6 +1891,7 @@ MonoBehaviour:
   muzzle: {fileID: 2051146903480029519}
   jolt: {fileID: 6659065980424095273}
   timeBetweenShots: 0
+  baseSpread: 0.01
   spreadPerShot: 0.01
   pelletsPerShot: 1
   projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
@@ -1900,6 +1901,7 @@ MonoBehaviour:
   maxSpread: 0.1
   recoveryScale: 0.1
   thrown: 0
+  accumulatedSpread: 0
   switcher: {fileID: 6561933035523379178}
   force: 10
   inheritMomentum: 0
@@ -2151,6 +2153,7 @@ MonoBehaviour:
     muzzleFlash: {fileID: 0}
     availableAmmo: 0
     spareAmmo: 0
+  reloading: 0
   reloadTime: 1
   source: {fileID: 9140588717393834509}
 --- !u!1 &8167055465043853244
@@ -2426,7 +2429,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8418960975685011053, guid: 6073ec8abb2d02d40b590eafee52275f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.01
+      value: -0.035
       objectReference: {fileID: 0}
     - target: {fileID: 8418960975685011053, guid: 6073ec8abb2d02d40b590eafee52275f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3666,12 +3669,7 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 59bb1299f9e6fc248bcaee1e853f5326, type: 2}
     - target: {fileID: 9500000, guid: 7ee836d470c7821438a87a304a93f52f, type: 3}
       propertyPath: m_WarningMessage
-      value: "\nBinding warning: Some generic clip(s) animate transforms that are
-        already bound by a Humanoid avatar. These transforms can only be changed
-        by Humanoid clips.\n\tTransform 'RightArm'\n\tTransform 'RightForeArm'\n\tTransform
-        'Neck'\n\tTransform 'RightHand'\n\tTransform 'Head'\n\tTransform 'RightArm'\n\tTransform
-        'RightForeArm'\n\tTransform 'Neck'\n\tTransform 'RightHand'\n\tTransform
-        'Head'\n\tand more ..."
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 9500000, guid: 7ee836d470c7821438a87a304a93f52f, type: 3}
       propertyPath: m_ApplyRootMotion

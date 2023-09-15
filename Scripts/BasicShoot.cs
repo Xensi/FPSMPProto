@@ -15,7 +15,8 @@ public class BasicShoot : NetworkBehaviour
 
     private float weaponTimer;
     public float timeBetweenShots = 0.1f; //can only fire if weapon timer is greater than time between shots
-    public float spreadPerShot = 0.01f;
+    public float baseSpread = 0.01f;
+    public float spreadPerShot = 0.01f; 
     public int pelletsPerShot = 1;
     public Projectile projectile;
     [SerializeField] private Rigidbody body; 
@@ -25,7 +26,7 @@ public class BasicShoot : NetworkBehaviour
     public float recoveryScale = 0.1f;
 
     public bool thrown = false;
-    private float accumulatedSpread = 0;
+    public float accumulatedSpread = 0;
     [SerializeField] private WeaponSwitcher switcher;
     public float force = 10;
     public bool inheritMomentum = false;  
@@ -46,9 +47,9 @@ public class BasicShoot : NetworkBehaviour
         { 
             PlayerControl();
         }
-        if (accumulatedSpread > 0)
+        if (accumulatedSpread > baseSpread)
         {
-            accumulatedSpread = Mathf.Clamp(accumulatedSpread -= Time.deltaTime * recoveryScale, 0, maxSpread);
+            accumulatedSpread = Mathf.Clamp(accumulatedSpread -= Time.deltaTime * recoveryScale, baseSpread, maxSpread);
         }
     }
     private void PlayerControl()

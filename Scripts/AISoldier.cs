@@ -10,7 +10,20 @@ public class AISoldier : NetworkBehaviour
 	public Vector3 target;
 	IAstarAI ai;
 	[HideInInspector] public SpawnSoldier spawner;
+	[SerializeField] private WeaponSwitcher switcher; 
     public LayerMask mask;
+	[SerializeField] private Transform eyes;
+	public Collider focusEnemy;
+	[SerializeField] private float rotationSpeed = 10;
+	[SerializeField] private BasicShoot shooter;
+	public enum States
+    {
+		SearchingForEnemies,
+		FiringAtEnemies,
+		Reloading, //take cover while reloading
+		SearchingForAmmo
+    }
+	public States state = States.SearchingForEnemies;
 	 
 	void OnDisable()
 	{
@@ -39,48 +52,85 @@ public class AISoldier : NetworkBehaviour
     {
 		if (IsOwner)
         {
-
+			//friendly
         }
         else
         {
-
-        }
-    }
-	[SerializeField] private Transform eyes;
-	public Collider focusEnemy;
-	[SerializeField] private float rotationSpeed = 10;
-	[SerializeField] private BasicShoot shooter;
+			SetLayerAllChildren(transform, 11);
+		}
+	}
+	void SetLayerAllChildren(Transform root, int layer)
+	{
+		var children = root.GetComponentsInChildren<Transform>(includeInactive: true);
+		foreach (var child in children)
+		{
+			Debug.Log(child.name);
+			child.gameObject.layer = layer;
+		}
+	}
     void Update()
 	{
 		if (IsOwner)
         { 
 			if (target != null && ai != null) ai.destination = target;
-			SeekEnemy();
+            switch (state)
+            {
+                case States.SearchingForEnemies:
+					SeekEnemy();
+					break;
+                case States.FiringAtEnemies:
+					FireAtEnemy();
+					break;
+                case States.Reloading:
+                    break;
+                default:
+                    break;
+            }
         }
 	}  
 	private void SeekEnemy()
-    { 
+    {
+		CheckIfNeedReload();
 		if (focusEnemy == null)
-        { 
-			for (int i = -10; i <= 10; i++) //60 degrees
-			{
-				//once it spots an enemy, stores it as a "known enemy" and focuses on them? 
-				//Physics.Raycast(transform.position, transform.forward); 
-				Vector3 dir = Quaternion.AngleAxis(3 * i, eyes.up) * eyes.forward;
-				bool val = Physics.Raycast(eyes.position, dir, out RaycastHit hit, Mathf.Infinity, mask, QueryTriggerInteraction.Ignore);
-				if (val && hit.collider.gameObject.layer != 3) //hit something other than obstacle
-				{
-					Debug.DrawRay(eyes.position, dir * hit.distance, Color.red);
-					focusEnemy = hit.collider;
-				}
-				else
-				{
-					Debug.DrawRay(eyes.position, dir, Color.white);
-				} 
-			}
+        {
+			ScanForEnemy(); 
 		}
         else
         {
+			state = States.FiringAtEnemies;
+        } 
+	}
+	private void ScanForEnemy()
+    {
+		for (int i = -10; i <= 10; i++) //60 degrees
+		{
+			//once it spots an enemy, stores it as a "known enemy" and focuses on them? 
+			//Physics.Raycast(transform.position, transform.forward); 
+			Vector3 dir = Quaternion.AngleAxis(3 * i, eyes.up) * eyes.forward;
+			bool val = Physics.Raycast(eyes.position, dir, out RaycastHit hit, Mathf.Infinity, mask, QueryTriggerInteraction.Ignore);
+			if (val && hit.collider.gameObject.layer != 3 && (hit.collider.gameObject.layer == 7 || hit.collider.gameObject.layer == 11)) //hit something other than obstacle // && hit.collider.gameObject.layer == 12
+			{ 
+				Debug.DrawRay(eyes.position, dir * hit.distance, Color.red);
+				focusEnemy = hit.collider;
+			}
+			else
+			{
+				Debug.DrawRay(eyes.position, dir, Color.white);
+			}
+		}
+	}
+	private void CheckIfNeedReload()
+	{
+		if (switcher.activeWeaponType.availableAmmo <= 0)
+		{
+			switcher.StartReload();
+		} 
+	}
+	private void FireAtEnemy()
+    {
+		CheckIfNeedReload();
+		if (focusEnemy != null)
+        { 
 			//raycast to see if enemy is still visible to us: 
 			Vector3 heading = focusEnemy.transform.position - eyes.position;
 			bool val = Physics.Raycast(eyes.position, heading, out RaycastHit hit, Mathf.Infinity, mask, QueryTriggerInteraction.Ignore);
@@ -90,15 +140,26 @@ public class AISoldier : NetworkBehaviour
 				RotateTowardsTransform(eyes, focusEnemy.transform, rotationSpeed); //rotate towards enemy
 				if (Vector3.Dot(heading.normalized, eyes.forward.normalized) > .9f) //if pointing in direction of enemy, shoot
 				{
-					if (shooter != null) shooter.AIShoot();
+					if (switcher.activeWeaponType.availableAmmo > 0)
+					{
+						if (shooter != null)
+						{
+							shooter.AIShoot();
+						}
+					}
 				}
 			}
-            else //lost them ...
+			else //lost them ...
 			{
 				Debug.DrawRay(eyes.position, heading, Color.white);
 				focusEnemy = null;
-            }
+				//state = States.SearchingForEnemies;
+			}
 		}
+        else
+        {
+			state = States.SearchingForEnemies;
+        } 
 	}
 	private void RotateTowardsTransform(Transform toRotate, Transform target, float rotationSpeed)
     {

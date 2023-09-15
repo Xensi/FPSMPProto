@@ -5,6 +5,7 @@ public class WeaponData : ScriptableObject
     public float timeBetweenShots = 0.1f;
     public AudioClip gunSound;
     public AudioClip reloadSound;
+    public float baseSpread = 0.01f;
     public float spreadPerShot = 0.01f;
     public float maxSpread = 0f;
     public float recoveryScale = 0.1f; //lower number is slower to recover

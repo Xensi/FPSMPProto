@@ -15,7 +15,7 @@ public class WeaponSwitcher : NetworkBehaviour
     [SerializeField] private TMP_Text ammoText;
     private float scrollTimer = 0;
     public WeaponType activeWeaponType;
-    private bool reloading = false;
+    public bool reloading = false;
     public float reloadTime = 1;
     private float reloadTimer = 0;
     [SerializeField] private AudioSource source;
@@ -36,13 +36,27 @@ public class WeaponSwitcher : NetworkBehaviour
     }
     void Update()
 	{
-        if (!playerControlled) return;
-        if (IsOwner) //client can press a number to instantly switch to different weapon
+        if (playerControlled)
         {
-            KeyPressSwitchWeapons();
-            ScrollWheelSwitchWeapons();
-            CheckReload();
-            ReloadProgress();
+            if (IsOwner) //client can press a number to instantly switch to different weapon
+            {
+                KeyPressSwitchWeapons();
+                ScrollWheelSwitchWeapons();
+                CheckReload();
+                ReloadProgress();
+            }
+        }
+        else
+        {
+            if (IsOwner)
+            {
+                ReloadProgress();
+            } 
+        }
+
+        if (IsOwner)
+        {
+
         }
         else
         {
@@ -83,12 +97,15 @@ public class WeaponSwitcher : NetworkBehaviour
     { 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            if (!reloading)
-            {
-                reloading = true;
-                reloadTimer = 0;
-            }
-            //PerformReload();
+            StartReload();
+        }
+    }
+    public void StartReload()
+    { 
+        if (!reloading)
+        {
+            reloading = true;
+            reloadTimer = 0; 
         }
     }
     private AudioClip reloadSound;
@@ -173,6 +190,8 @@ public class WeaponSwitcher : NetworkBehaviour
         weaponTypes[id].visualsToShow.SetActive(true);
         shooter.muzzle = weaponTypes[id].muzzleFlash;
         shooter.timeBetweenShots = weapon.timeBetweenShots;
+        shooter.baseSpread = weapon.baseSpread;
+        shooter.accumulatedSpread = weapon.baseSpread; //just set it now
         shooter.spreadPerShot = weapon.spreadPerShot;
         shooter.pelletsPerShot = weapon.pelletsPerShot;
         shooter.damage = weapon.damage;
