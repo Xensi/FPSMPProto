@@ -72,8 +72,21 @@ public class AISoldier : NetworkBehaviour
 	{
 		if (IsOwner)
         { 
-			if (target != null && ai != null) ai.destination = target;
-            switch (state)
+			if (closestCoverPos == null)
+            { 
+				SearchForClosestUnoccupiedCoverPosition();
+				if (target != null && ai != null) ai.destination = target;
+			}
+            else if (closestCoverPos.occupier == null)
+			{
+				ai.destination = closestCoverPos.transform.position;
+			}
+			else if (closestCoverPos.occupier != col)
+            {
+				closestCoverPos = null;
+            }
+
+			switch (state)
             {
                 case States.SearchingForEnemies:
 					SeekEnemy();
@@ -100,7 +113,39 @@ public class AISoldier : NetworkBehaviour
 			state = States.FiringAtEnemies;
         } 
 	}
-	private void ScanForEnemy()
+	[SerializeField] private LayerMask coverMask;
+	float searchRadius = 25;
+	public CoverPosition closestCoverPos;
+
+	[SerializeField] private Collider col;
+	private void SearchForClosestUnoccupiedCoverPosition()
+    {
+		int maxColliders = 30;
+		Collider[] hitColliders = new Collider[maxColliders];
+		int numColliders = Physics.OverlapSphereNonAlloc(transform.position, searchRadius, hitColliders, coverMask, QueryTriggerInteraction.Collide);
+		float dist = Mathf.Infinity;
+		float newDist;  
+		for (int i = 0; i < numColliders; i++)
+		{
+			newDist = Vector3.Distance(transform.position, hitColliders[i].transform.position);
+			if (newDist < dist)
+			{
+				if (hitColliders[i].TryGetComponent(out CoverPosition cover))
+                { 
+					if (cover.occupier == null)
+                    { 
+						dist = newDist;
+						closestCoverPos = cover;
+					}
+				}
+            }
+		} 
+	}
+    private void OnDrawGizmos()
+    {
+		Gizmos.DrawWireSphere(transform.position, searchRadius);
+    }
+    private void ScanForEnemy()
     {
 		for (int i = -10; i <= 10; i++) //60 degrees
 		{

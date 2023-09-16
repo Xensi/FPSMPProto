@@ -208,7 +208,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 7935
+    m_Bits: 24319
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1159,6 +1159,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soldierPrefab: {fileID: 6280676031596710573, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
   ownedSoldiers: []
+  designatorPrefab: {fileID: 8611468491891929221, guid: 32fb2c52d5384de49b9f7283b55e54c6, type: 3}
+  designatorMask:
+    serializedVersion: 2
+    m_Bits: 16392
 --- !u!1 &5437855904979341710
 GameObject:
   m_ObjectHideFlags: 0
@@ -1649,7 +1653,7 @@ MonoBehaviour:
   groundCheck: {fileID: 1449962462117053268}
   groundMask:
     serializedVersion: 2
-    m_Bits: 319
+    m_Bits: 16703
   playerMovementState: 0
   wallMask:
     serializedVersion: 2
@@ -4456,7 +4460,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2917385771132950209, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0911
+      value: 0.0628
       objectReference: {fileID: 0}
     - target: {fileID: 2917385771132950209, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
       propertyPath: m_LocalPosition.z

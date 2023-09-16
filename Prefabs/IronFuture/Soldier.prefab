@@ -53,6 +53,7 @@ MonoBehaviour:
   muzzle: {fileID: 3502849501794503860}
   jolt: {fileID: 2076377723176335225}
   timeBetweenShots: 0.1
+  baseSpread: 0.01
   spreadPerShot: 0.01
   pelletsPerShot: 1
   projectile: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
@@ -62,6 +63,7 @@ MonoBehaviour:
   maxSpread: 0.1
   recoveryScale: 0.1
   thrown: 0
+  accumulatedSpread: 0
   switcher: {fileID: 1905458914979944401}
   force: 10
   inheritMomentum: 0
@@ -98,6 +100,7 @@ MonoBehaviour:
     muzzleFlash: {fileID: 0}
     availableAmmo: 0
     spareAmmo: 0
+  reloading: 0
   reloadTime: 1
   source: {fileID: 873878615399630547}
 --- !u!1 &1717403270129495837
@@ -226,11 +229,16 @@ MonoBehaviour:
   mask:
     serializedVersion: 2
     m_Bits: 7368
-  state: 0
   eyes: {fileID: 3181119859606402735}
   focusEnemy: {fileID: 0}
   rotationSpeed: 2
   shooter: {fileID: 3911897495381879372}
+  state: 0
+  coverMask:
+    serializedVersion: 2
+    m_Bits: 8192
+  closestCoverPos: {fileID: 0}
+  col: {fileID: 3575757182920905685}
 --- !u!114 &9007370302634644025
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -308,7 +316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   version: 5
-  radius: 0.5
+  radius: 0.4
   height: 2
   canMove: 1
   maxSpeed: 4
@@ -331,7 +339,7 @@ MonoBehaviour:
   maxAcceleration: -2.5
   rotationSpeed: 360
   slowdownDistance: 0.6
-  pickNextWaypointDist: 2
+  pickNextWaypointDist: 0.5
   endReachedDistance: 0.2
   alwaysDrawGizmos: 0
   slowWhenNotFacingTarget: 1

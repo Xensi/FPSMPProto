@@ -6,23 +6,49 @@ public class SpawnSoldier : NetworkBehaviour
 {
     [SerializeField] private AISoldier soldierPrefab;
     public List<AISoldier> ownedSoldiers;
-
+    [SerializeField] private GameObject designatorPrefab;
+    private GameObject designator;
+    public LayerMask designatorMask;
+    public override void OnNetworkSpawn()
+    {
+        if (designator == null)
+        {
+            designator = Instantiate(designatorPrefab, transform.position, Quaternion.identity);
+            designator.SetActive(false);
+        }
+    }
     private void Update()
     {
         if (Input.GetMouseButtonDown(2))
         {
             SpawnSoldierUmbrella();
         }
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetKey(KeyCode.Q)) //display target marker
         {
-            CommandSoldiers();
+            ShowTarget();
+        }
+        if (Input.GetKeyUp(KeyCode.Q))
+        { 
+            CommandGoToTarget();
         }
     }
-    private void CommandSoldiers()
+    private void ShowTarget()
     {
+        designator.SetActive(true);
+        Vector3 shootDirection = transform.forward;
+        Ray ray = new Ray(transform.position, shootDirection);
+        RaycastHit hit; //otherwise, make raycast */ 
+        if (Physics.Raycast(ray, out hit, 100, designatorMask)) //if raycast hits something  
+        {
+            designator.transform.position = hit.point;
+        }
+    }
+    private void CommandGoToTarget()
+    {
+        designator.SetActive(false);
         foreach (AISoldier item in ownedSoldiers)
         {
-            item.target = transform.position;
+            item.target = designator.transform.position;
         }
     }
     private void SpawnSoldierUmbrella() 
@@ -51,6 +77,6 @@ public class SpawnSoldier : NetworkBehaviour
         {
             soldier.netObj.SpawnWithOwnership(clientId); 
         }
-        //server puts new soldier in client's list
+    //server puts new soldier in client's list
     }  
 }
