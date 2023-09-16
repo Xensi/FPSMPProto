@@ -8,6 +8,7 @@ public class AISoldier : NetworkBehaviour
 {
     public NetworkObject netObj;
 	public Transform target;
+	public Transform lookTarget;
 	IAstarAI ai;
 	[HideInInspector] public SpawnSoldier spawner;
 	[SerializeField] private WeaponSwitcher switcher; 
@@ -67,11 +68,20 @@ public class AISoldier : NetworkBehaviour
 			child.gameObject.layer = layer;
 		}
 	}
+	[SerializeField] private Transform defaultLook;
     void Update()
 	{
 		if (IsOwner)
 		{
 			if (target != null && ai != null) ai.destination = target.position;
+			if (lookTarget != null)
+            { 
+				RotateTowardsTransform(eyes, lookTarget, rotationSpeed); //rotate towards enemy
+			}
+            else
+            {
+				RotateTowardsTransform(eyes, defaultLook, rotationSpeed);
+			}
 			/*if (closestCoverPos == null)
             { 
 				SearchForClosestUnoccupiedCoverPosition();
@@ -86,7 +96,7 @@ public class AISoldier : NetworkBehaviour
 				closestCoverPos = null;
             }*/
 
-			switch (state)
+			/*switch (state)
             {
                 case States.SearchingForEnemies:
 					SeekEnemy();
@@ -98,8 +108,8 @@ public class AISoldier : NetworkBehaviour
                     break;
                 default:
                     break;
-            }
-        }
+            }*/
+		}
 	}  
 	private void SeekEnemy()
     {

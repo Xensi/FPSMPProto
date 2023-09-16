@@ -1160,9 +1160,13 @@ MonoBehaviour:
   soldierPrefab: {fileID: 6280676031596710573, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
   ownedSoldiers: []
   designatorPrefab: {fileID: 8611468491891929221, guid: 32fb2c52d5384de49b9f7283b55e54c6, type: 3}
+  lookDesignatorPrefab: {fileID: 8611468491891929221, guid: 8dfc3a4f72cf42a4aa78914ecc17984f, type: 3}
   designatorMask:
     serializedVersion: 2
     m_Bits: 16392
+  lookDesignatorMask:
+    serializedVersion: 2
+    m_Bits: 18568
 --- !u!1 &5437855904979341710
 GameObject:
   m_ObjectHideFlags: 0

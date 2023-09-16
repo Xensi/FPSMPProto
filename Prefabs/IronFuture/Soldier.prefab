@@ -205,6 +205,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4007961611829184395}
   - {fileID: 3181119859606402735}
   - {fileID: 6262920184525211026}
   m_Father: {fileID: 0}
@@ -223,7 +224,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   netObj: {fileID: 4097907284816366616}
-  target: {x: 0, y: 0, z: 0}
+  target: {fileID: 0}
+  lookTarget: {fileID: 0}
   spawner: {fileID: 0}
   switcher: {fileID: 1905458914979944401}
   mask:
@@ -234,6 +236,7 @@ MonoBehaviour:
   rotationSpeed: 2
   shooter: {fileID: 3911897495381879372}
   state: 0
+  defaultLook: {fileID: 4007961611829184395}
   coverMask:
     serializedVersion: 2
     m_Bits: 8192
@@ -776,6 +779,37 @@ MonoBehaviour:
     m_InternalValue: 0
   player: {fileID: 5474626561547328258}
   playerObjectsToChangeLayers: []
+--- !u!1 &8621000519394964974
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4007961611829184395}
+  m_Layer: 10
+  m_Name: Look
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4007961611829184395
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8621000519394964974}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.448, z: 1.258}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4670302336766985974}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1792500781687838017
 PrefabInstance:
   m_ObjectHideFlags: 0

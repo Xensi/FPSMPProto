@@ -7,15 +7,18 @@ public class SpawnSoldier : NetworkBehaviour
     [SerializeField] private AISoldier soldierPrefab;
     public List<AISoldier> ownedSoldiers;
     [SerializeField] private GameObject designatorPrefab;
+    [SerializeField] private GameObject lookDesignatorPrefab;
     private GameObject designator;
+    private GameObject lookDesignator;
     public LayerMask designatorMask;
+    public LayerMask lookDesignatorMask;
     public override void OnNetworkSpawn()
     {
-        if (designator == null)
-        {
-            designator = Instantiate(designatorPrefab, transform.position, Quaternion.identity);
-            designator.SetActive(false);
-        }
+        designator = Instantiate(designatorPrefab, transform.position, Quaternion.identity);
+        designator.SetActive(false);
+
+        lookDesignator = Instantiate(lookDesignatorPrefab, transform.position, Quaternion.identity);
+        lookDesignator.SetActive(false);
     }
     private void Update()
     {
@@ -39,16 +42,55 @@ public class SpawnSoldier : NetworkBehaviour
         {
             FollowMe();
         }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ClearLookTargets();
+        }
+        if (Input.GetKey(KeyCode.F)) //display target marker
+        {
+            ShowLookTarget();
+        }
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            LookInThatDirection();
+        }
+    }
+    private void ShowLookTarget()
+    {
+        lookDesignator.SetActive(true);
+        Vector3 shootDirection = transform.forward;
+        Ray ray = new Ray(transform.position, shootDirection);
+        RaycastHit hit; //otherwise, make raycast */ 
+        if (Physics.Raycast(ray, out hit, 100, lookDesignatorMask)) //if raycast hits something  
+        {
+            lookDesignator.transform.position = hit.point;
+        }
+    }
+    private void ClearLookTargets()
+    {
+        foreach (AISoldier item in ownedSoldiers)
+        {
+            item.lookTarget = null;
+        }
+    }
+    private void LookInThatDirection()
+    {
+        foreach (AISoldier item in ownedSoldiers)
+        {
+            item.lookTarget = lookDesignator.transform;
+        }
     }
     private void ClearTargets()
     {
         foreach (AISoldier item in ownedSoldiers)
         {
             item.target = null;
+            item.lookTarget = null;
         }
     }
     private void FollowMe()
     {
+        designator.SetActive(false);
         foreach (AISoldier item in ownedSoldiers)
         {
             item.target = transform;
@@ -66,8 +108,7 @@ public class SpawnSoldier : NetworkBehaviour
         }
     }
     private void CommandGoToTarget()
-    {
-        designator.SetActive(false);
+    { 
         foreach (AISoldier item in ownedSoldiers)
         {
             item.target = designator.transform;
