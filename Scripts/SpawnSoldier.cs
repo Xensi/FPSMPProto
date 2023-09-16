@@ -23,6 +23,10 @@ public class SpawnSoldier : NetworkBehaviour
         {
             SpawnSoldierUmbrella();
         }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            ClearTargets();
+        }
         if (Input.GetKey(KeyCode.Q)) //display target marker
         {
             ShowTarget();
@@ -30,6 +34,24 @@ public class SpawnSoldier : NetworkBehaviour
         if (Input.GetKeyUp(KeyCode.Q))
         { 
             CommandGoToTarget();
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            FollowMe();
+        }
+    }
+    private void ClearTargets()
+    {
+        foreach (AISoldier item in ownedSoldiers)
+        {
+            item.target = null;
+        }
+    }
+    private void FollowMe()
+    {
+        foreach (AISoldier item in ownedSoldiers)
+        {
+            item.target = transform;
         }
     }
     private void ShowTarget()
@@ -48,7 +70,7 @@ public class SpawnSoldier : NetworkBehaviour
         designator.SetActive(false);
         foreach (AISoldier item in ownedSoldiers)
         {
-            item.target = designator.transform.position;
+            item.target = designator.transform;
         }
     }
     private void SpawnSoldierUmbrella() 

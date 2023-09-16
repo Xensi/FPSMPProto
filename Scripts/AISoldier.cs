@@ -7,7 +7,7 @@ using Pathfinding;
 public class AISoldier : NetworkBehaviour
 {
     public NetworkObject netObj;
-	public Vector3 target;
+	public Transform target;
 	IAstarAI ai;
 	[HideInInspector] public SpawnSoldier spawner;
 	[SerializeField] private WeaponSwitcher switcher; 
@@ -37,8 +37,7 @@ public class AISoldier : NetworkBehaviour
 		if (IsOwner)
 		{
 			ai = GetComponent<IAstarAI>();
-			if (ai != null) ai.onSearchPath += Update;
-			target = transform.position;
+			if (ai != null) ai.onSearchPath += Update; 
 			spawner = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<SpawnSoldier>();
 			spawner.ownedSoldiers.Add(this);
 		}
@@ -71,8 +70,9 @@ public class AISoldier : NetworkBehaviour
     void Update()
 	{
 		if (IsOwner)
-        { 
-			if (closestCoverPos == null)
+		{
+			if (target != null && ai != null) ai.destination = target.position;
+			/*if (closestCoverPos == null)
             { 
 				SearchForClosestUnoccupiedCoverPosition();
 				if (target != null && ai != null) ai.destination = target;
@@ -84,7 +84,7 @@ public class AISoldier : NetworkBehaviour
 			else if (closestCoverPos.occupier != col)
             {
 				closestCoverPos = null;
-            }
+            }*/
 
 			switch (state)
             {
