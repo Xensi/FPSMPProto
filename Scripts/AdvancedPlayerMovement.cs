@@ -11,7 +11,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     [SerializeField] protected float jumpDistance = 40f;
     protected float defaultSpeed = 36f;
     protected float sprintMult = 1.3f;
-    protected float groundRadius = 0.45f; //radius 
+    protected float groundRadius = 0.35f; //radius 
     protected bool isGrounded;
     protected float moveSpeed;
 
@@ -41,7 +41,8 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private float yRotation;
     [SerializeField] private Transform keepUpright; 
     [SerializeField] private bool canWallRun = true;
-
+    [SerializeField] private Transform camJoltRef;
+    [SerializeField] private CapsuleCollider capsule;
     void Start()
     { 
         Cursor.lockState = CursorLockMode.Locked;
@@ -51,7 +52,27 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     {
         LookAround();
         CheckJumping();
+        CheckCrouching();
     }
+    private void CheckCrouching()
+    {
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            capsule.height = 1;
+            capsule.center = new Vector3(0, 0.5f, 0);
+            groundCheck.localPosition = new Vector3(0, .3f, 0);
+            body.AddForce(-keepUpright.up * 10, ForceMode.Force);
+            crouchingModifier = 0.5f;
+        }
+        else
+        {
+            capsule.height = 2;
+            capsule.center = new Vector3(0, 0, 0);
+            groundCheck.localPosition = new Vector3(0, -.7f, 0);
+            crouchingModifier = 1;
+        }
+    }
+    private float crouchingModifier = 1;
     private void LateUpdate()
     {
         AngleAdjust(); 
@@ -72,7 +93,6 @@ public class AdvancedPlayerMovement : NetworkBehaviour
 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0); //rotate camera locally   
     }
-    [SerializeField] private Transform camJoltRef;
     private void AngleAdjust()
     {
         //keepUpright.localRotation = Quaternion.Euler(-xRotation, 0, 0);
@@ -96,9 +116,11 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         moveDirection = keepUpright.right * x + keepUpright.forward * z;
         Vector3 horizontalMoveDir = keepUpright.right * x;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundRadius, groundMask);
+
+
         if (isGrounded && playerMovementState != MovementStates.Sliding)
         {
-            body.AddForce(10 * moveSpeed * moveDirection.normalized, ForceMode.Force);
+            body.AddForce(10 * moveSpeed * crouchingModifier * moveDirection.normalized, ForceMode.Force);
         }
         /*else if (isGrounded && playerMovementState == MovementStates.Sliding)
         {
@@ -193,11 +215,12 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
         body.AddForce(keepUpright.up * jumpDistance, ForceMode.Impulse);
     }
+    [SerializeField] private bool canSlide = true;
     private void UpdateState()
     { 
         if (isGrounded)
         {
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (Input.GetKey(KeyCode.LeftControl) && canSlide)
             {
                 playerMovementState = MovementStates.Sliding;
             }

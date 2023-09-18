@@ -22,8 +22,10 @@ public class AISoldier : NetworkBehaviour
 		SearchingForEnemies,
 		FiringAtEnemies,
 		Reloading, //take cover while reloading
-		SearchingForAmmo
-    }
+		SearchingForAmmo, 
+		TakingCover,
+		RunningFromGrenade
+	}
 	public States state = States.SearchingForEnemies;
 	 
 	void OnDisable()
@@ -47,6 +49,17 @@ public class AISoldier : NetworkBehaviour
 			SoldierStorage.Instance.enemySoldiers.Add(this);
 		}
 		SetLayers();
+	}
+	public void GetSuppressed()
+    {
+		Crouch();
+    }
+	[SerializeField] private Rigidbody body;
+	private void Crouch()
+    { 
+		col.height = 1;
+		col.center = new Vector3(0, 0.5f, 0); 
+		body.AddForce(-transform.up * 10, ForceMode.Force); 
 	}
 	private void SetLayers()
     {
@@ -127,7 +140,7 @@ public class AISoldier : NetworkBehaviour
 	float searchRadius = 25;
 	public CoverPosition closestCoverPos;
 
-	[SerializeField] private Collider col;
+	[SerializeField] private CapsuleCollider col;
 	private void SearchForClosestUnoccupiedCoverPosition()
     {
 		int maxColliders = 30;
