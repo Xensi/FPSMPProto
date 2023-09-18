@@ -14,12 +14,16 @@ public class SenseDanger : MonoBehaviour
         else */
         if (other.gameObject.layer == 15)
         {
-
+            GrenadeSensed(other);
         }
     }
-    public void IncomingProjectileSensed()
+    private void GrenadeSensed(Collider col)
     {
-        Debug.Log("Scared");
+        Debug.Log("Grenade");
+        ai.RunAwayFromGrenade(col);
+    }
+    public void IncomingProjectileSensed()
+    { 
         ai.GetSuppressed();
     }
 }

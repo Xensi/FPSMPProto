@@ -7,10 +7,10 @@ public class CoverPosition : MonoBehaviour
     public Collider occupier;
     private void OnTriggerEnter(Collider other)
     {
-        occupier = other;
+        if (!other.isTrigger) occupier = other; 
     }
     private void OnTriggerExit(Collider other)
     {
-        occupier = null;
+        if (!other.isTrigger) occupier = null;
     }
 }

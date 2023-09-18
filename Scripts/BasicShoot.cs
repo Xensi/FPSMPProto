@@ -166,16 +166,18 @@ public class BasicShoot : NetworkBehaviour
     { 
         LayerMask mask = LayerMask.GetMask("Sensor");
         Vector3 shootDirection = transform.forward;
-        Ray ray = new Ray(transform.position, shootDirection);
-        RaycastHit hit; //otherwise, make raycast 
-        if (Physics.Raycast(ray, out hit, 100, mask, QueryTriggerInteraction.Collide)) //if raycast hits something  
+        Ray ray = new Ray(transform.position, shootDirection); 
+        RaycastHit[] m_Results = new RaycastHit[5]; 
+        if (Physics.RaycastNonAlloc(transform.position, transform.forward, m_Results, 200, mask, QueryTriggerInteraction.Collide) > 0)
         {
-            if (hit.collider.TryGetComponent(out SenseDanger sensor))
+            foreach (RaycastHit result in m_Results)
             {
-                sensor.IncomingProjectileSensed();
+                if (result.collider.TryGetComponent(out SenseDanger sensor))
+                {
+                    sensor.IncomingProjectileSensed();
+                }
             }
-        }
-        Debug.DrawRay(transform.position, shootDirection * 100, Color.red);
+        } 
     }
     private void ProjectileUmbrella(bool inheritVelocity = false)
     {

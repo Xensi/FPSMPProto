@@ -295,14 +295,15 @@ MonoBehaviour:
   focusEnemy: {fileID: 0}
   rotationSpeed: 2
   shooter: {fileID: 3911897495381879372}
-  state: 0
-  body: {fileID: 5594070840530415669}
-  defaultLook: {fileID: 4007961611829184395}
+  pathfinder: {fileID: 0}
   coverMask:
     serializedVersion: 2
     m_Bits: 8192
   closestCoverPos: {fileID: 0}
   col: {fileID: 3575757182920905685}
+  defaultLook: {fileID: 4007961611829184395}
+  body: {fileID: 5594070840530415669}
+  state: 4
 --- !u!114 &9007370302634644025
 MonoBehaviour:
   m_ObjectHideFlags: 0
