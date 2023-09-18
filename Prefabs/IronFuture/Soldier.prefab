@@ -146,8 +146,8 @@ GameObject:
   - component: {fileID: 3821201149328587171}
   - component: {fileID: 7902955203534776005}
   - component: {fileID: 4520805209260737631}
-  m_Layer: 10
-  m_Name: SixthSense
+  m_Layer: 16
+  m_Name: IncomingSensor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

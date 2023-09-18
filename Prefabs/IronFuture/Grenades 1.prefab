@@ -94,7 +94,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 746537292371343154, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Name
-      value: Grenades
+      value: Grenades 1
       objectReference: {fileID: 0}
     - target: {fileID: 1551827702973853363, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Mass
@@ -110,7 +110,7 @@ PrefabInstance:
       objectReference: {fileID: 13400000, guid: 8c43730f6b77e0047a1c323463a37ac9, type: 2}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: fuseTime
-      value: 1.25
+      value: 4.5
       objectReference: {fileID: 0}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: stopOnImpact

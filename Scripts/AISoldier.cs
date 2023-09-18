@@ -17,6 +17,7 @@ public class AISoldier : NetworkBehaviour
 	public Collider focusEnemy;
 	[SerializeField] private float rotationSpeed = 10;
 	[SerializeField] private BasicShoot shooter;
+	[SerializeField] private AIPath pathfinder;
 	public enum States
     {
 		SearchingForEnemies,
@@ -50,17 +51,6 @@ public class AISoldier : NetworkBehaviour
 		}
 		SetLayers();
 	}
-	public void GetSuppressed()
-    {
-		Crouch();
-    }
-	[SerializeField] private Rigidbody body;
-	private void Crouch()
-    { 
-		col.height = 1;
-		col.center = new Vector3(0, 0.5f, 0); 
-		body.AddForce(-transform.up * 10, ForceMode.Force); 
-	}
 	private void SetLayers()
     {
 		if (IsOwner)
@@ -81,11 +71,55 @@ public class AISoldier : NetworkBehaviour
 			child.gameObject.layer = layer;
 		}
 	}
-	[SerializeField] private Transform defaultLook;
-    void Update()
+	[SerializeField] private Transform defaultLook; 
+	[SerializeField] private Rigidbody body;
+	private float suppressionTimer = 0;
+	private bool crouching = false;
+	private void Crouch()
+	{
+		col.height = 1;
+		col.center = new Vector3(0, 0.5f, 0);
+		body.AddForce(-transform.up * 10, ForceMode.Force);
+		pathfinder.maxSpeed = 2;
+	}
+	private void StandUp()
+    {
+		col.height = 2;
+		col.center = new Vector3(0, 0, 0);
+		pathfinder.maxSpeed = 4;
+	}
+	private void UpdateSuppression()
+    {
+		if (suppressionTimer > 0)
+        {
+			suppressionTimer = Mathf.Clamp(suppressionTimer -= Time.deltaTime, 0, 999);
+			if (!crouching)
+            {
+				crouching = true;
+				Crouch();
+			}
+        }
+        else
+        { 
+			if (crouching)
+            {
+				crouching = false;
+				StandUp();
+            }
+        } 
+	} 
+	public void GetSuppressed()
+	{
+		if (Random.Range(1, 11) <= 2)
+        { 
+			suppressionTimer = Mathf.Clamp(suppressionTimer += Random.Range(1, 3), 0, 5);
+		}
+	}
+	void Update()
 	{
 		if (IsOwner)
 		{
+			UpdateSuppression();
 			if (target != null && ai != null) ai.destination = target.position;
 			if (lookTarget != null)
             { 

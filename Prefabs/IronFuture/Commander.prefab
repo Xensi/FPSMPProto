@@ -2216,24 +2216,14 @@ MonoBehaviour:
     muzzleFlash: {fileID: 2051146903480029519}
     availableAmmo: 0
     spareAmmo: 0
-  - data: {fileID: 11400000, guid: 36d1ee8c280f6114a953feec2c5e3e44, type: 2}
-    visualsToShow: {fileID: 5663311986684535595}
-    muzzleFlash: {fileID: 117427854847237351}
-    availableAmmo: 0
-    spareAmmo: 0
-  - data: {fileID: 11400000, guid: 1e681754cc1f7e44eabd9aba16cfd2d0, type: 2}
-    visualsToShow: {fileID: 1791574091892070525}
-    muzzleFlash: {fileID: 5631333000092434678}
-    availableAmmo: 0
-    spareAmmo: 0
-  - data: {fileID: 11400000, guid: 92a00d339afd88d40be18f5a52e12e54, type: 2}
-    visualsToShow: {fileID: 4894409187779571294}
-    muzzleFlash: {fileID: 1692187394671457096}
-    availableAmmo: 0
-    spareAmmo: 0
-  - data: {fileID: 11400000, guid: 0a6fe44ed450c374084b98dba828ac67, type: 2}
+  - data: {fileID: 11400000, guid: 968a1dc5bbe7df14c9ea978a10fcf648, type: 2}
     visualsToShow: {fileID: 7097739596947227938}
     muzzleFlash: {fileID: 6597803697226121670}
+    availableAmmo: 0
+    spareAmmo: 0
+  - data: {fileID: 11400000, guid: 5ab753ab6f7c2d24391ad8aa378e973e, type: 2}
+    visualsToShow: {fileID: 5663311986684535595}
+    muzzleFlash: {fileID: 117427854847237351}
     availableAmmo: 0
     spareAmmo: 0
   shooter: {fileID: 2388376419523812764}
@@ -4968,11 +4958,6 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
---- !u!198 &1692187394671457096 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 2917385771113552373, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
-  m_PrefabInstance: {fileID: 4541732471570016957}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1692187394689809532 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2917385771132950209, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
@@ -5261,11 +5246,6 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
---- !u!198 &5631333000092434678 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 2917385771113552373, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
-  m_PrefabInstance: {fileID: 7375244044201449731}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5631333000107642818 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2917385771132950209, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}

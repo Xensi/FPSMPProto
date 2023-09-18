@@ -160,17 +160,22 @@ public class BasicShoot : NetworkBehaviour
         switcher.SubtractAmmo(ammoPerShot);
         ProjectileUmbrella(inheritMomentum);
         ShowGunCosmeticEffects();
-        /*Vector3 shootDirection = transform.forward; 
+        SuppressAI();
+    }
+    private void SuppressAI()
+    { 
+        LayerMask mask = LayerMask.GetMask("Sensor");
+        Vector3 shootDirection = transform.forward;
         Ray ray = new Ray(transform.position, shootDirection);
-        RaycastHit hit; //otherwise, make raycast */
-        //Debug.DrawRay(transform.position, shootDirection, Color.red, 1);
-        /*if (Physics.Raycast(ray, out hit, range, canHitMask)) //if raycast hits something  
-        { 
-            if (hit.collider.TryGetComponent(out Hurtbox hurtbox))
+        RaycastHit hit; //otherwise, make raycast 
+        if (Physics.Raycast(ray, out hit, 100, mask, QueryTriggerInteraction.Collide)) //if raycast hits something  
+        {
+            if (hit.collider.TryGetComponent(out SenseDanger sensor))
             {
-                DealDamageUmbrella(bulletDamage, hurtbox);
+                sensor.IncomingProjectileSensed();
             }
-        }*/
+        }
+        Debug.DrawRay(transform.position, shootDirection * 100, Color.red);
     }
     private void ProjectileUmbrella(bool inheritVelocity = false)
     {

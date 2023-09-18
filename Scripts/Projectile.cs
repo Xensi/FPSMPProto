@@ -61,8 +61,19 @@ public class Projectile : NetworkBehaviour
             }
         } 
     }
+    private float timer = 0;
     private void Update()
-    {
+    {  
+        if (timer < 10)
+        {
+            timer += Time.deltaTime;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+
         if (fuseTime > 0)
         {
             fuseTime -= Time.deltaTime;

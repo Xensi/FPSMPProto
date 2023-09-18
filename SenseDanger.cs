@@ -7,13 +7,19 @@ public class SenseDanger : MonoBehaviour
     [SerializeField] private AISoldier ai;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == 9)
+        /*if (other.gameObject.layer == 9)
         {
-            ai.GetSuppressed();
+            //IncomingProjectileSensed();
         }
-        else if (other.gameObject.layer == 15)
+        else */
+        if (other.gameObject.layer == 15)
         {
 
         }
+    }
+    public void IncomingProjectileSensed()
+    {
+        Debug.Log("Scared");
+        ai.GetSuppressed();
     }
 }
