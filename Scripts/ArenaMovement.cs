@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Unity.Netcode;
-public class AdvancedPlayerMovement : NetworkBehaviour
+public class ArenaMovement : NetworkBehaviour
 {
     [SerializeField] protected Animator animator;
     [SerializeField] protected TMP_Text speed;
@@ -38,13 +38,12 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private float mouseSensitivity = 400f;  
 
     private float xRotation;
-    private float yRotation; 
+    private float yRotation;
+    [SerializeField] private Transform keepUpright; 
     [SerializeField] private bool canWallRun = true;
     [SerializeField] private Transform camJoltRef;
     [SerializeField] private CapsuleCollider capsule;
     [SerializeField] private Transform cameraMovementParent;
-    [SerializeField] private Transform rotateY;
-    private float playerHeight = 2;
     void Start()
     { 
         Cursor.lockState = CursorLockMode.Locked;
@@ -56,29 +55,33 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         CheckJumping();
         CheckCrouching();
     }
-    void FixedUpdate()
-    {
-        Movement();
-    }
     private void CheckCrouching()
     {
         if (Input.GetKey(KeyCode.LeftControl))
         {
             capsule.height = 1;
             capsule.center = new Vector3(0, 0.5f, 0);
-            //groundCheck.localPosition = new Vector3(0, .3f, 0);
-            body.AddForce(-transform.up * 10, ForceMode.Force);
+            groundCheck.localPosition = new Vector3(0, .3f, 0);
+            body.AddForce(-keepUpright.up * 10, ForceMode.Force);
             crouchingModifier = 0.5f;
         }
         else
         {
             capsule.height = 2;
             capsule.center = new Vector3(0, 0, 0);
-            //groundCheck.localPosition = new Vector3(0, -.7f, 0);
+            groundCheck.localPosition = new Vector3(0, -.7f, 0);
             crouchingModifier = 1;
         }
     }
-    private float crouchingModifier = 1; 
+    private float crouchingModifier = 1;
+    private void LateUpdate()
+    {
+        AngleAdjust(); 
+    }
+    void FixedUpdate()
+    {
+        Movement();
+    }
     private void LookAround()
     {
         // up and down synced, side to side not synced ???
@@ -88,17 +91,24 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         yRotation += mouseX;
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90, 90); //prevent over rotation
-            
-        rotateY.rotation = Quaternion.Euler(0, yRotation, 0);
-        cameraMovementParent.localRotation = Quaternion.Euler(xRotation, 0, 0); 
+
+        cameraMovementParent.rotation = Quaternion.Euler(xRotation, yRotation, 0); //rotate camera locally   
     }
+    private void AngleAdjust()
+    {
+        //keepUpright.localRotation = Quaternion.Euler(-xRotation, 0, 0);
+        keepUpright.localRotation = Quaternion.Euler(-camJoltRef.rotation.eulerAngles.x, 0, 0); 
+    } 
     void Movement()
     {
-        Walk(); 
+        Walk();
+        if (canWallRun) WallRunMovement();
         UpdateDrag();
         UpdateState();
-        //UpdateAnimation(); 
-        SpeedControl(); 
+        UpdateAnimation();
+        //speed.text = "Speed: " + body.velocity.magnitude;
+        SpeedControl();
+
     } 
     private void SpeedControl()
     {
@@ -124,11 +134,11 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         //try tying to camera angle?
         x = Input.GetAxis("Horizontal");
         z = Input.GetAxis("Vertical");
-        moveDirection = transform.right * x + transform.forward * z;
-        Vector3 horizontalMoveDir = transform.right * x;
+        moveDirection = keepUpright.right * x + keepUpright.forward * z;
+        Vector3 horizontalMoveDir = keepUpright.right * x;
         //isGrounded = Physics.CheckSphere(groundCheck.position, groundRadius, groundMask); 
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
-        Debug.DrawRay(transform.position, Vector3.down * (playerHeight * 0.5f + 0.2f));
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, 1 + 0.2f, groundMask);
+
         onSlope = OnSlope();
         if (onSlope)
         {
@@ -166,10 +176,11 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private bool onSlope = false;
     private bool OnSlope()
     {  
-        if (Physics.Raycast(transform.position,  Vector3.down, out slopeHit, 1 + 0.3f, groundMask))
+        if (Physics.Raycast(keepUpright.position,  Vector3.down, out slopeHit, 1 + 0.3f, groundMask))
         {
-            //Debug.DrawRay(transform.position, Vector3.down * 1.3f, Color.green);
-            float angle = Vector3.Angle(Vector3.up, slopeHit.normal); 
+            //Debug.DrawRay(keepUpright.position, Vector3.down * 1.3f, Color.green);
+            float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
+            Debug.Log(angle);
             return angle < maxSlopeAngle && angle != 0;
         }
         return false;
@@ -177,6 +188,36 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private Vector3 GetSlopeMoveDirection()
     {
         return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
+    }
+    private void WallRunMovement()
+    {
+        if ((playerMovementState == MovementStates.Wallrunning) && z > 0 & !isGrounded)
+        {
+
+            wallNormal = wallRight ? outRightHit.normal : outLeftHit.normal;
+            Vector3 wallForward = Vector3.Cross(wallNormal, keepUpright.up);
+
+            if ((keepUpright.forward - wallForward).magnitude > (keepUpright.forward + wallForward).magnitude)
+            {
+                wallForward = -wallForward;
+            }
+
+            body.AddForce(10 * moveSpeed * wallForward, ForceMode.Force);
+            if (!(wallLeft && x > 0) && !(wallRight && x < 0)) //stick on
+            {
+                //body.AddForce(-wallNormal * 100, ForceMode.Force); 
+                if (body.velocity.y <= 0)
+                {
+                    body.useGravity = false;
+                    //body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
+                    body.AddForce(0.75f * -9.81f * keepUpright.up, ForceMode.Force);
+                }
+            }
+        }
+        else
+        {
+            body.useGravity = true;
+        }
     } 
     private void UpdateDrag()
     {
@@ -204,17 +245,27 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private void CheckJumping()
     {
         if (Input.GetButtonDown("Jump"))
-        { 
-            if (isGrounded || onSlope)
+        {
+            if (playerMovementState == MovementStates.Wallrunning)
+            {
+                WallRunJump();
+            }
+            else if (isGrounded || onSlope)
             {
                 Jump();
             } 
         }  
-    } 
+    }
+    private void WallRunJump()
+    { 
+        body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
+        body.AddForce(keepUpright.up * jumpDistance, ForceMode.Impulse);
+        body.AddForce(.75f * jumpDistance * wallNormal, ForceMode.Impulse);
+    }
     private void Jump()
     { 
         body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
-        body.AddForce(transform.up * jumpDistance, ForceMode.Impulse);
+        body.AddForce(keepUpright.up * jumpDistance, ForceMode.Impulse);
     }
     [SerializeField] private bool canSlide = true;
     private void UpdateState()
@@ -275,7 +326,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     }
     private void OnDrawGizmos()
     {
-        //Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
-        //Debug.DrawRay(transform.position, transform.right * wallCheckDist, Color.white);
+        Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
+        Debug.DrawRay(transform.position, transform.right * wallCheckDist, Color.white);
     } 
 }
