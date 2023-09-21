@@ -10,6 +10,7 @@ public class CapturePoint : NetworkBehaviour
     public float captureProgress = 0; //switch team at 100. min 0
     public int balanceOfPower = 0;
     public List<Hurtbox> presentSoldiers;
+    //remove null soldiers
     public override void OnNetworkSpawn()
     {
         if (IsServer)

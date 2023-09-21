@@ -110,6 +110,7 @@ public class SpawnSoldier : NetworkBehaviour
     }
     private void CommandGoToTarget()
     { 
+        //generate line formation
         foreach (AISoldier item in ownedSoldiers)
         {
             item.movementState = AISoldier.MovementStates.MovingToCommandedPosition;

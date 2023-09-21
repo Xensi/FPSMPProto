@@ -31,9 +31,10 @@ public class AISoldier : NetworkBehaviour
     {   
 		TakingCover,
 		RunningFromGrenade,
-		MovingToCommandedPosition //moving to commanded position, while still fighting
+		MovingToCommandedPosition, //moving to commanded position, while still fighting
+		ChargingForward
 	}
-	public MovementStates movementState = MovementStates.TakingCover;
+	public MovementStates movementState = MovementStates.ChargingForward;
 	public enum FiringStates
     {
 		SearchingForEnemies,
@@ -63,21 +64,17 @@ public class AISoldier : NetworkBehaviour
 			ai = GetComponent<IAstarAI>();
 			if (ai != null) ai.onSearchPath += Update; 
 			spawner = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<SpawnSoldier>();
-			spawner.ownedSoldiers.Add(this);
+			spawner.ownedSoldiers.Add(this); //fix this so that soldiers are added to specific players
 		}
         else //if not owner, assume is enemy
         { 
 			SoldierStorage.Instance.enemySoldiers.Add(this);
-		}
-		SetLayers();
+		} 
 	}
-	private void SetLayers()
+	public void SetLayers()
     {
-		if (IsOwner)
-        {
-			//friendly
-        }
-        else
+		Hurtbox box = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<Hurtbox>();
+		if (box.team.Value != hurtbox.team.Value)
         {
 			SetLayerAllChildren(transform, 11);
 		}
@@ -100,10 +97,11 @@ public class AISoldier : NetworkBehaviour
 		//col.height = 1;
 		//col.center = new Vector3(0, 0.5f, 0);
 		//body.AddForce(-transform.up * 10, ForceMode.Force);
-		pathfinder.maxSpeed = 2;
+		pathfinder.maxSpeed = fastSpeed*.5f;
 	}
 	float smoothTime = 0.1f;
 	float yVelocity = 0.0f;
+	private float fastSpeed = 8; 
 	private void StandUp()
 	{
 		col.height = Mathf.SmoothDamp(col.height, 2, ref yVelocity, smoothTime);
@@ -112,7 +110,7 @@ public class AISoldier : NetworkBehaviour
 		//col.height = 2;
 		//col.center = new Vector3(0, 0, 0);
 		//transform.position = new Vector3(transform.position.x, transform.position.y + 1.1f, transform.position.z);
-		pathfinder.maxSpeed = 4;
+		pathfinder.maxSpeed = fastSpeed;
 	}
 	/// <summary>
 	/// We can be suppressed by sufficient gunfire
@@ -166,10 +164,10 @@ public class AISoldier : NetworkBehaviour
 	}
 	private void UpdateStates()
 	{
-		switch (movementState)
-        {  
+        switch (movementState)
+        {
             case MovementStates.TakingCover: //i'm not behind cover!
-				GoToUnoccupiedCover();
+                GoToUnoccupiedCover();
                 break;
             case MovementStates.RunningFromGrenade:
                 GoToPosition();
@@ -182,9 +180,13 @@ public class AISoldier : NetworkBehaviour
                     movementState = MovementStates.TakingCover;
                 }
                 break;
-            case MovementStates.MovingToCommandedPosition: 
+            case MovementStates.MovingToCommandedPosition:
+                FollowTransform();
+                break;
+            case MovementStates.ChargingForward:
+				target = Global.Instance.directionOfBattle;
 				FollowTransform();
-				break;
+                break;
             default:
                 break;
         }
@@ -196,7 +198,15 @@ public class AISoldier : NetworkBehaviour
                 if (focusEnemy == null)
                 {
                     ScanForEnemy();
-                }
+					if (hurtbox.team.Value == 0)
+                    {
+						eyes.rotation = Quaternion.LookRotation(Vector3.RotateTowards(eyes.forward, Global.Instance.directionOfBattle.forward, Time.deltaTime * rotationSpeed, 0));
+					}
+                    else
+                    {
+						eyes.rotation = Quaternion.LookRotation(Vector3.RotateTowards(eyes.forward, -Global.Instance.directionOfBattle.forward, Time.deltaTime * rotationSpeed, 0));
+					} 
+				}
                 else
                 {
                     firingState = FiringStates.FiringAtEnemies;
@@ -266,7 +276,7 @@ public class AISoldier : NetworkBehaviour
 			default:
 				break;
 		}
-	}
+    }
     private float grenadeTimer = 0;
 	private void SearchForClosestUnoccupiedCoverPosition()
 	{
@@ -320,13 +330,23 @@ public class AISoldier : NetworkBehaviour
 			{
 				//once it spots an enemy, stores it as a "known enemy" and focuses on them? 
 				//Physics.Raycast(transform.position, transform.forward); 
-				Vector3 dir = Quaternion.AngleAxis(3 * i, eyes.up) * eyes.forward;
-				dir = Quaternion.AngleAxis(10 * j, eyes.right) * dir;
+				Vector3 dir = Quaternion.AngleAxis(3 * i, eyes.up) * eyes.forward;	
+				dir = Quaternion.AngleAxis(-5 * j, eyes.right) * dir;
 				bool val = Physics.Raycast(eyes.position, dir, out RaycastHit hit, Mathf.Infinity, mask, QueryTriggerInteraction.Ignore);
-				if (val && hit.collider.gameObject.layer != 3 && (hit.collider.gameObject.layer == 7 || hit.collider.gameObject.layer == 11)) //hit something other than obstacle // && hit.collider.gameObject.layer == 12
+				if (val && hit.collider.gameObject.layer != 3) //hit something other than obstacle // && hit.collider.gameObject.layer == 12
 				{
-					Debug.DrawRay(eyes.position, dir * hit.distance, Color.red);
-					focusEnemy = hit.collider;
+					//is collider something with a hurtbox?
+					if (hit.collider.gameObject.layer == 6 || hit.collider.gameObject.layer == 7 || hit.collider.gameObject.layer == 10 || hit.collider.gameObject.layer == 11)
+                    {
+						if (hit.collider.TryGetComponent(out Hurtbox box))
+                        {
+							if (box.team.Value != hurtbox.team.Value)
+                            { 
+								Debug.DrawRay(eyes.position, dir * hit.distance, Color.red);
+								focusEnemy = hit.collider;
+							}
+						}
+                    }
 				}
 				else
 				{

@@ -6,10 +6,9 @@ public class Global : MonoBehaviour
 {
     public static Global Instance { get; private set; }
     public Terrain terrain;
+    public Transform directionOfBattle; 
     private void Awake()
-    {
-        // If there is an instance, and it's not me, delete myself.
-
+    {  
         if (Instance != null && Instance != this)
         {
             Destroy(this);

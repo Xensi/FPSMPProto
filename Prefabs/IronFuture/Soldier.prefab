@@ -84,7 +84,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControlled: 0
   weaponTypes:
-  - data: {fileID: 11400000, guid: 8c4cdbc6a0d87ac4e8c8b36369ef6b3b, type: 2}
+  - data: {fileID: 11400000, guid: 40acb5b274da73848844150f473c1c82, type: 2}
     visualsToShow: {fileID: 5776684374629639284}
     muzzleFlash: {fileID: 3502849501794503860}
     availableAmmo: 0
@@ -304,7 +304,9 @@ MonoBehaviour:
   defaultLook: {fileID: 4007961611829184395}
   body: {fileID: 5594070840530415669}
   hurtbox: {fileID: 6173494653802690054}
-  state: 4
+  movementState: 3
+  firingState: 0
+  standState: 0
 --- !u!114 &9007370302634644025
 MonoBehaviour:
   m_ObjectHideFlags: 0

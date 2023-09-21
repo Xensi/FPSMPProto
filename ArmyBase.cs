@@ -9,7 +9,10 @@ public class ArmyBase : NetworkBehaviour
     [SerializeField] private List<Transform> spawnPoints;
     public override void OnNetworkSpawn()
     { 
-        InvokeRepeating(nameof(ReinforcementWave), 0, 60);
+        if (IsServer)
+        { 
+            InvokeRepeating(nameof(ReinforcementWave), 0, 60);
+        }
     }
     private void ReinforcementWave()
     {
@@ -26,6 +29,7 @@ public class ArmyBase : NetworkBehaviour
             //soldier.netObj.SpawnWithOwnership(OwnerClientId);
             soldier.netObj.Spawn();
             soldier.hurtbox.team.Value = team;
+            soldier.SetLayers();
         }
         /*else
         {
