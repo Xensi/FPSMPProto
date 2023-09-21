@@ -114,9 +114,11 @@ public class Projectile : NetworkBehaviour
                     hurtbox.DealDamageUmbrella(damage);
                 }
             } 
-        } 
+        }
+        if (dig != null) dig.ExplodeTerrain();
         Destroy(gameObject);
     }
+    [SerializeField] private ProjectileTerrainDig dig;
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, explodeRadius);

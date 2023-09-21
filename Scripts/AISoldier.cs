@@ -115,7 +115,7 @@ public class AISoldier : NetworkBehaviour
 	} 
 	public void GetSuppressed()
 	{
-		if (Random.Range(1, 11) <= 2)
+		if (Random.Range(1, 11) <= 3)
         { 
 			suppressionTimer = Mathf.Clamp(suppressionTimer += Random.Range(1, 3), 0, 5);
 		}
