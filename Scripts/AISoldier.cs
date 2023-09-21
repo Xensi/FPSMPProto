@@ -6,7 +6,7 @@ using Pathfinding;
 
 public class AISoldier : NetworkBehaviour
 {
-    public NetworkObject netObj;
+	public NetworkObject netObj;
 	public Transform target;
 	public Transform lookTarget;
 	IAstarAI ai;
@@ -25,18 +25,23 @@ public class AISoldier : NetworkBehaviour
 	[SerializeField] private CapsuleCollider col;
 	[SerializeField] private Transform defaultLook;
 	[SerializeField] private Rigidbody body;
-	private float suppressionTimer = 0;
-	private bool crouching = false;
-	public enum States
-    { 
+	private float suppressionTimer = 0; 
+	public Hurtbox hurtbox;
+	public enum MovementStates
+    {   
+		TakingCover,
+		RunningFromGrenade,
+		MovingToCommandedPosition //moving to commanded position, while still fighting
+	}
+	public MovementStates movementState = MovementStates.TakingCover;
+	public enum FiringStates
+    {
 		SearchingForEnemies,
 		FiringAtEnemies,
-		Reloading, //take cover while reloading
-		SearchingForAmmo, 
-		TakingCover,
-		RunningFromGrenade
+		Reloading,
+		FullyOutOfAmmo
 	}
-	public States state = States.TakingCover;
+	public FiringStates firingState = FiringStates.SearchingForEnemies;
 	 
 	void OnDisable()
 	{
@@ -45,6 +50,12 @@ public class AISoldier : NetworkBehaviour
 			if (ai != null) ai.onSearchPath -= Update; 
 		}
 	} 
+	public enum StandStates
+    {
+		Standing,
+		Crouching
+    }
+	public StandStates standState = StandStates.Standing;
     public override void OnNetworkSpawn()
 	{
 		if (IsOwner)
@@ -80,38 +91,39 @@ public class AISoldier : NetworkBehaviour
 			child.gameObject.layer = layer;
 		}
 	}
+	float centerVelocity;
 	private void Crouch()
-	{
-		col.height = 1;
-		col.center = new Vector3(0, 0.5f, 0);
-		body.AddForce(-transform.up * 10, ForceMode.Force);
+	{ 
+		col.height = Mathf.SmoothDamp(col.height, 1, ref yVelocity, smoothTime);
+		float newPos = Mathf.SmoothDamp(col.center.y, .5f, ref centerVelocity, smoothTime);
+		col.center = new Vector3(0, newPos, 0);
+		//col.height = 1;
+		//col.center = new Vector3(0, 0.5f, 0);
+		//body.AddForce(-transform.up * 10, ForceMode.Force);
 		pathfinder.maxSpeed = 2;
 	}
+	float smoothTime = 0.1f;
+	float yVelocity = 0.0f;
 	private void StandUp()
-    {
-		col.height = 2;
-		col.center = new Vector3(0, 0, 0);
+	{
+		col.height = Mathf.SmoothDamp(col.height, 2, ref yVelocity, smoothTime);
+		float newPos = Mathf.SmoothDamp(col.center.y, 0, ref centerVelocity, smoothTime);
+		col.center = new Vector3(0, newPos, 0);
+		//col.height = 2;
+		//col.center = new Vector3(0, 0, 0);
+		//transform.position = new Vector3(transform.position.x, transform.position.y + 1.1f, transform.position.z);
 		pathfinder.maxSpeed = 4;
 	}
+	/// <summary>
+	/// We can be suppressed by sufficient gunfire
+	/// </summary>
 	private void UpdateSuppression()
     {
 		if (suppressionTimer > 0)
         {
 			suppressionTimer = Mathf.Clamp(suppressionTimer -= Time.deltaTime, 0, 999);
-			if (!crouching)
-            {
-				crouching = true;
-				Crouch();
-			}
-        }
-        else
-        { 
-			if (crouching)
-            {
-				crouching = false;
-				StandUp();
-            }
-        } 
+			standState = StandStates.Crouching;
+		} 
 	} 
 	public void GetSuppressed()
 	{
@@ -137,108 +149,125 @@ public class AISoldier : NetworkBehaviour
 			/**/
 		}
 	}
+	private void GoToUnoccupiedCover()
+    {
+		if (closestCoverPos == null) //we don't know of any cover
+		{
+			SearchForClosestUnoccupiedCoverPosition();
+		}
+		else if (closestCoverPos.occupier == null) //we have cover that is empty
+		{
+			ai.destination = closestCoverPos.transform.position;
+		}
+		else if (closestCoverPos.occupier != col) //cover is occupied by another
+		{
+			closestCoverPos = null;
+		}
+	}
 	private void UpdateStates()
 	{
-		switch (state)
-		{
-			case States.SearchingForEnemies: //actively scanning for enemy 
-				UpdateSuppression();
-				CheckIfNeedReload();
-				if (focusEnemy == null)
-				{
-					ScanForEnemy();
-				}
-				else
-				{
-					state = States.FiringAtEnemies;
-				}
-				if (closestCoverPos == null || closestCoverPos.occupier != col)
-                {
-					state = States.TakingCover;
-                }
+		switch (movementState)
+        {  
+            case MovementStates.TakingCover: //i'm not behind cover!
+				GoToUnoccupiedCover();
                 break;
-            case States.FiringAtEnemies: //shooting at enemy 
-				UpdateSuppression();
-				CheckIfNeedReload();
-				if (focusEnemy != null)
-				{
-					//raycast to see if enemy is still visible to us: 
-					Vector3 heading = focusEnemy.transform.position - eyes.position;
-					bool val = Physics.Raycast(eyes.position, heading, out RaycastHit hit, Mathf.Infinity, mask, QueryTriggerInteraction.Ignore);
-					if (val && hit.collider == focusEnemy) //if still visible
-					{
-						Debug.DrawRay(eyes.position, heading * hit.distance, Color.red);
-						RotateTowardsTransform(eyes, focusEnemy.transform, rotationSpeed); //rotate towards enemy
-						if (Vector3.Dot(heading.normalized, eyes.forward.normalized) > .9f) //if pointing in direction of enemy, shoot
-						{
-							if (switcher.activeWeaponType.availableAmmo > 0)
-							{
-								if (shooter != null)
-								{
-									shooter.AIShoot();
-								}
-							}
-						}
-					}
-					else //lost them ...
-					{
-						Debug.DrawRay(eyes.position, heading, Color.white);
-						focusEnemy = null;
-						//state = States.SearchingForEnemies;
-					}
-				}
-				else
-				{
-					state = States.SearchingForEnemies;
-				}
-				break;
-            case States.Reloading: //reloading, out of ammo 
-                if (switcher.activeWeaponType.availableAmmo > 0)
+            case MovementStates.RunningFromGrenade:
+                GoToPosition();
+                if (grenadeTimer > 0)
                 {
-                    if (crouching)
-                    {
-                        crouching = false;
-                        StandUp();
-                    }
-                    state = States.SearchingForEnemies;
+                    grenadeTimer -= Time.deltaTime;
                 }
                 else
                 {
-					if (!crouching)
-					{
-						crouching = true;
-						Crouch();
-					}
-				}
-                break;
-            case States.SearchingForAmmo: //out of spare ammo
-                break;
-            case States.TakingCover: //i'm not behind cover!
-				UpdateSuppression();
-				if (closestCoverPos == null) //we don't know of any cover
-				{
-					SearchForClosestUnoccupiedCoverPosition(); 
-				}
-				else if (closestCoverPos.occupier == null) //we have cover that is empty
-				{
-					ai.destination = closestCoverPos.transform.position;
-				}
-				else if (closestCoverPos.occupier != col) //cover is occupied by another
-				{
-					closestCoverPos = null;
-				}
-                else //we're in cover!
-                {
-					state = States.SearchingForEnemies;
+                    movementState = MovementStates.TakingCover;
                 }
+                break;
+            case MovementStates.MovingToCommandedPosition: 
+				FollowTransform();
 				break;
-            case States.RunningFromGrenade: 
-                GoToPosition();
+            default:
+                break;
+        }
+        switch (firingState)
+        {
+            case FiringStates.SearchingForEnemies: //actively scanning for enemy  
+				standState = StandStates.Standing;
+                CheckIfNeedReload();
+                if (focusEnemy == null)
+                {
+                    ScanForEnemy();
+                }
+                else
+                {
+                    firingState = FiringStates.FiringAtEnemies;
+                } 
+                break;
+            case FiringStates.FiringAtEnemies: //shooting at enemy   
+				standState = StandStates.Standing;
+				CheckIfNeedReload();
+                if (focusEnemy != null)
+                {
+                    //raycast to see if enemy is still visible to us: 
+                    Vector3 heading = focusEnemy.transform.position - eyes.position;
+                    bool val = Physics.Raycast(eyes.position, heading, out RaycastHit hit, Mathf.Infinity, mask, QueryTriggerInteraction.Ignore);
+                    if (val && hit.collider == focusEnemy) //if still visible
+                    {
+                        Debug.DrawRay(eyes.position, heading * hit.distance, Color.red);
+                        RotateTowardsTransform(eyes, focusEnemy.transform, rotationSpeed); //rotate towards enemy
+                        if (Vector3.Dot(heading.normalized, eyes.forward.normalized) > .9f) //if pointing in direction of enemy, shoot
+                        {
+                            if (switcher.activeWeaponType.availableAmmo > 0)
+                            {
+                                if (shooter != null)
+                                {
+                                    shooter.AIShoot();
+                                }
+                            }
+                        }
+                    }
+                    else //lost them ...
+                    {
+                        Debug.DrawRay(eyes.position, heading, Color.white);
+                        focusEnemy = null;
+                        //state = States.SearchingForEnemies;
+                    }
+                }
+                else
+                {
+                    firingState = FiringStates.SearchingForEnemies;
+                }
+                break;
+            case FiringStates.Reloading: //reloading, out of ammo 
+                if (switcher.activeWeaponType.availableAmmo > 0)
+                {  
+					firingState = FiringStates.SearchingForEnemies;
+					standState = StandStates.Standing;
+				}
+                else
+				{
+					standState = StandStates.Crouching;
+				}
+                break;
+            case FiringStates.FullyOutOfAmmo:
                 break;
             default:
                 break;
         }
+        
+        UpdateSuppression(); 
+		switch (standState)
+		{
+			case StandStates.Standing:
+				StandUp();
+				break;
+			case StandStates.Crouching:
+				Crouch();
+				break;
+			default:
+				break;
+		}
 	}
+    private float grenadeTimer = 0;
 	private void SearchForClosestUnoccupiedCoverPosition()
 	{
 		int maxColliders = 30;
@@ -267,7 +296,8 @@ public class AISoldier : NetworkBehaviour
 	{
 		Vector3 heading = col.transform.position - transform.position;
 		destPos = -heading.normalized * 10;
-		state = States.RunningFromGrenade;
+		grenadeTimer = 4;
+		movementState = MovementStates.RunningFromGrenade;
 	}
 	private void GoToPosition()
 	{
@@ -310,7 +340,7 @@ public class AISoldier : NetworkBehaviour
 		if (switcher.activeWeaponType.availableAmmo <= 0)
 		{ 
 			switcher.StartReload();
-			state = States.Reloading;
+			firingState = FiringStates.Reloading;
 		} 
 	} 
 	private void RotateTowardsTransform(Transform toRotate, Transform target, float rotationSpeed)

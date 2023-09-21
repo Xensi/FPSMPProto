@@ -235,10 +235,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc58972acfc4c524b9ebd513ff5dff69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strength: 0.5
-  brushWidth: 2
-  brushHeight: 1
+  strength: 0.25
+  brushWidth: 4
+  brushHeight: 4
   _targetTerrain: {fileID: 0}
+  pos: {x: 0, y: 0, z: 0}
 --- !u!1 &1236495322891900571
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,6 +1085,7 @@ MonoBehaviour:
   lookDesignatorMask:
     serializedVersion: 2
     m_Bits: 18568
+  hurtbox: {fileID: 634100251590758332}
 --- !u!1 &5437855904979341710
 GameObject:
   m_ObjectHideFlags: 0
@@ -1469,12 +1471,13 @@ MonoBehaviour:
   wallMask:
     serializedVersion: 2
     m_Bits: 63
-  keepUpright: {fileID: 0}
   canWallRun: 0
   camJoltRef: {fileID: 3943928064578249153}
   capsule: {fileID: 4513626102715081056}
   cameraMovementParent: {fileID: 737632234189645792}
   rotateY: {fileID: 6462728764829847030}
+  slopeCheck: 0.4
+  playerRadius: 0.5
   canSlide: 0
 --- !u!114 &7072144441012091553
 MonoBehaviour:
@@ -1530,6 +1533,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControlled: 1
   HP:
+    m_InternalValue: 0
+  team:
     m_InternalValue: 0
   player: {fileID: 6462728764829847028}
   playerObjectsToChangeLayers:

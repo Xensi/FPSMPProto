@@ -38,10 +38,15 @@ public class TerrainDigger : MonoBehaviour
                 heights[y, x] -= strength * Time.deltaTime;
             }
         }
-
+        //may be possible to make this circular
         terrainData.SetHeights(brushPosition.x, brushPosition.y, heights);
+        pos = Vector3Int.FloorToInt(worldPosition);
     }
-
+    public Vector3Int pos;
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(pos, 1);
+    }
     public Vector2Int GetBrushPosition(Vector3 worldPosition, int brushWidth, int brushHeight)
     {
         var terrainPosition = WorldToTerrainPosition(worldPosition);

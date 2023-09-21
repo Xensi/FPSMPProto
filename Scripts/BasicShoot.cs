@@ -171,10 +171,13 @@ public class BasicShoot : NetworkBehaviour
         if (Physics.RaycastNonAlloc(transform.position, transform.forward, m_Results, 200, mask, QueryTriggerInteraction.Collide) > 0)
         {
             foreach (RaycastHit result in m_Results)
-            {
-                if (result.collider.TryGetComponent(out SenseDanger sensor))
-                {
-                    sensor.IncomingProjectileSensed();
+            { 
+                if (result.collider != null)
+                { 
+                    if (result.collider.TryGetComponent(out SenseDanger sensor))
+                    {
+                        sensor.IncomingProjectileSensed();
+                    }
                 }
             }
         } 

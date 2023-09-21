@@ -4,9 +4,10 @@ using UnityEngine;
 using Unity.Netcode;
 //not disabled per player: exists all the time
 public class Hurtbox : NetworkBehaviour
-{
+{ 
     public bool playerControlled = true;
     public NetworkVariable<int> HP = new();
+    public NetworkVariable<int> team = new();
     private const int initialHP = 100;
     [SerializeField] private GameObject player;
     [SerializeField] private List<Transform> playerObjectsToChangeLayers; //assign visuals 

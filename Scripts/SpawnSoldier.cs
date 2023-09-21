@@ -61,7 +61,7 @@ public class SpawnSoldier : NetworkBehaviour
         Vector3 shootDirection = transform.forward;
         Ray ray = new Ray(transform.position, shootDirection);
         RaycastHit hit; //otherwise, make raycast */ 
-        if (Physics.Raycast(ray, out hit, 100, lookDesignatorMask)) //if raycast hits something  
+        if (Physics.Raycast(ray, out hit, 100, lookDesignatorMask, QueryTriggerInteraction.Ignore)) //if raycast hits something  
         {
             lookDesignator.transform.position = hit.point;
         }
@@ -93,6 +93,7 @@ public class SpawnSoldier : NetworkBehaviour
         designator.SetActive(false);
         foreach (AISoldier item in ownedSoldiers)
         {
+            item.movementState = AISoldier.MovementStates.MovingToCommandedPosition;
             item.target = transform;
         }
     }
@@ -111,15 +112,18 @@ public class SpawnSoldier : NetworkBehaviour
     { 
         foreach (AISoldier item in ownedSoldiers)
         {
+            item.movementState = AISoldier.MovementStates.MovingToCommandedPosition;
             item.target = designator.transform;
         }
     }
+    public Hurtbox hurtbox;
     private void SpawnSoldierUmbrella() 
     { //only server can spawn
         if (IsServer)
         {
             AISoldier soldier = Instantiate(soldierPrefab, transform.position, Quaternion.identity);
-            soldier.netObj.SpawnWithOwnership(OwnerClientId); 
+            soldier.netObj.SpawnWithOwnership(OwnerClientId);
+            soldier.hurtbox.team.Value = hurtbox.team.Value;
         }
         else
         {

@@ -62,7 +62,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     }
     private void CheckCrouching()
     {
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C))
         {
             capsule.height = 1;
             capsule.center = new Vector3(0, 0.5f, 0);
@@ -130,6 +130,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
         Debug.DrawRay(transform.position, Vector3.down * (playerHeight * 0.5f + 0.2f));
         onSlope = OnSlope();
+        Debug.DrawRay(transform.position, GetSlopeMoveDirection() * 20, Color.cyan);
         if (onSlope)
         {
             body.AddForce(10 * crouchingModifier * moveSpeed * GetSlopeMoveDirection(), ForceMode.Force);
@@ -164,14 +165,16 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     private float maxSlopeAngle = 85;
     private RaycastHit slopeHit;
     private bool onSlope = false;
+    [SerializeField] private float slopeCheck = 0.4f;
+    [SerializeField] private float playerRadius = 0.5f;
     private bool OnSlope()
     {  
-        if (Physics.Raycast(transform.position,  Vector3.down, out slopeHit, 1 + 0.3f, groundMask))
+        if (Physics.Raycast(transform.position + new Vector3(0, playerHeight *0.5f, playerRadius),  Vector3.down, out slopeHit, playerHeight + slopeCheck, groundMask))
         {
-            //Debug.DrawRay(transform.position, Vector3.down * 1.3f, Color.green);
+            Debug.DrawRay(transform.position + new Vector3(0, playerHeight * 0.5f, playerRadius), Vector3.down * (playerHeight + slopeCheck), Color.green);
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal); 
             return angle < maxSlopeAngle && angle != 0;
-        }
+        } 
         return false;
     }
     private Vector3 GetSlopeMoveDirection()
