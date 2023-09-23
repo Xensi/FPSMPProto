@@ -71,17 +71,19 @@ public class SpawnSoldier : NetworkBehaviour
         ArmyBase armyBase; // to charge towards
         Transform chargeTowards;
         float offset = 1;
-        float offsetAmount = 100 * 0.45f;
+        float offsetAmount = 100 * 1f;
         if (hurtbox.team.Value == 0)
         {
             armyBase = Global.Instance.base0;
-            chargeTowards = GameWinChecker.Instance.nextCapZone0;
+            //chargeTowards = GameWinChecker.Instance.nextCapZone0;
+            chargeTowards = Global.Instance.base1.transform;
             offset = -1;
         }
         else
         {
             armyBase = Global.Instance.base1;
-            chargeTowards = GameWinChecker.Instance.nextCapZone1;
+            //chargeTowards = GameWinChecker.Instance.nextCapZone1;
+            chargeTowards = Global.Instance.base0.transform;
         }
         Vector3 destination = chargeTowards.transform.position + new Vector3(0, 0, offsetAmount * offset);
         SoldiersGoToDestination(armyBase, destination);

@@ -397,7 +397,7 @@ MonoBehaviour:
   defaultLook: {fileID: 4007961611829184395}
   body: {fileID: 5594070840530415669}
   hurtbox: {fileID: 6173494653802690054}
-  movementState: 4
+  movementState: 3
   firingState: 0
   standState: 0
   throwData:

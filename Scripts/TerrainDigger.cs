@@ -7,17 +7,25 @@ public class TerrainDigger : MonoBehaviour
     public float strength = 1;
     public int brushWidth = 1;
     public int brushHeight = 1;
-    public Terrain _targetTerrain; 
+    public Terrain _targetTerrain;
+    public bool playerControlled = false;
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (playerControlled)
         { 
-            if (Physics.Raycast(transform.position, transform.forward, out var hit, Mathf.Infinity))
+            if (Input.GetKeyDown(KeyCode.T))
             {
-                if (hit.transform.TryGetComponent(out Terrain terrain)) _targetTerrain = terrain; 
-                LowerTerrain(hit.point, strength, brushWidth, brushHeight);
-                Debug.DrawLine(transform.position, hit.point, Color.red, 2);
+                if (Physics.Raycast(transform.position, transform.forward, out var hit, Mathf.Infinity))
+                {
+                    if (hit.transform.TryGetComponent(out Terrain terrain)) _targetTerrain = terrain;
+                    LowerTerrain(hit.point, strength, brushWidth, brushHeight);
+                    Debug.DrawLine(transform.position, hit.point, Color.red, 2);
+                }
             }
+        }
+        else
+        {
+
         }
     } 
 

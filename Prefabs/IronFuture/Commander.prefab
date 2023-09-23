@@ -239,6 +239,7 @@ MonoBehaviour:
   brushWidth: 4
   brushHeight: 4
   _targetTerrain: {fileID: 0}
+  playerControlled: 1
   pos: {x: 0, y: 0, z: 0}
 --- !u!1 &1236495322891900571
 GameObject:
@@ -1034,6 +1035,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 18568
   hurtbox: {fileID: 634100251590758332}
+  spread: 3
 --- !u!1 &5437855904979341710
 GameObject:
   m_ObjectHideFlags: 0
