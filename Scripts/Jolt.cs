@@ -19,12 +19,12 @@ public class Jolt : MonoBehaviour
     private void Update()
     {
         targetRotation = Vector3.Lerp(targetRotation, Vector3.zero, joltReturnSpeed * Time.deltaTime);
-        currentRotation = Vector3.Slerp(currentRotation, targetRotation, joltSnapSpeed * Time.fixedDeltaTime);
+        currentRotation = Vector3.Slerp(currentRotation, targetRotation, joltSnapSpeed * Time.deltaTime);
         transform.localRotation = Quaternion.Euler(currentRotation);
 
 
         targetPos = Vector3.Lerp(targetPos, defaultPos, joltReturnSpeed * Time.deltaTime);
-        transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, joltSnapSpeed * Time.fixedDeltaTime);
+        transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, joltSnapSpeed * Time.deltaTime);
         
     } 
     public void FireJolt()

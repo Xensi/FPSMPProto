@@ -1398,7 +1398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   soldierPrefab: {fileID: 6280676031596710573, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
-  artilleryPrefab: {fileID: 6280676031596710573, guid: 2c07f0dbd7faf474bad6eb6d51222e64, type: 3}
+  artilleryPrefab: {fileID: 6002650287391422677, guid: deb06b97e06035f48bdca232a7342855, type: 3}
   spawnPoints:
   - {fileID: 2013543957}
   - {fileID: 928979708}
@@ -1449,6 +1449,7 @@ MonoBehaviour:
   - {fileID: 7587804367352692200}
   - {fileID: 1931015970888302535}
   spawnedSoldiers: []
+  cam: {fileID: 0}
 --- !u!114 &7443572228560708808
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -16,21 +16,22 @@ MonoBehaviour:
   gunSound: {fileID: 8300000, guid: 421b860a7b03c934d913eabe6c7e9620, type: 3}
   reloadSound: {fileID: 0}
   baseSpread: 0.01
-  spreadPerShot: 0.01
-  maxSpread: 0
+  spreadPerShot: 0
+  maxSpread: 1
   recoveryScale: 0.1
   pelletsPerShot: 1
   damage: 100
   projectile: {fileID: 8841976647714836687, guid: f702d5e956b11d84686f227406a5bad5, type: 3}
-  force: 20
+  force: 100
   inheritMomentum: 0
   thrown: 0
   startingAmmo: 100
   ammoPerShot: 1
-  reloadTime: 1
+  reloadTime: 10
   magSize: 1
   joltX: -25
   joltY: 25
   joltZ: 25
   joltReturnSpeed: 50
   aiIndirectFire: 1
+  aiRatio: 0.5

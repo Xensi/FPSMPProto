@@ -1489,6 +1489,8 @@ MonoBehaviour:
   - {fileID: 8172274587895367532}
   - {fileID: 0}
   - {fileID: 0}
+  soldier: {fileID: 0}
+  alive: 1
 --- !u!1 &6943025712402035770
 GameObject:
   m_ObjectHideFlags: 0

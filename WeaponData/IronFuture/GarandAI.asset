@@ -33,3 +33,5 @@ MonoBehaviour:
   joltY: 25
   joltZ: 25
   joltReturnSpeed: 50
+  aiIndirectFire: 0
+  aiRatio: 0.5

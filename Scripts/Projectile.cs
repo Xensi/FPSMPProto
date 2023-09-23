@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Pathfinding;
 public class Projectile : NetworkBehaviour
 {
     public Rigidbody body;
@@ -15,6 +16,7 @@ public class Projectile : NetworkBehaviour
     public ulong id = 0;
     public bool firedByPlayer = true;
     [SerializeField] private GameObject bulletHole;
+    public float maxLifetime = 10;
     private void OnCollisionEnter(Collision collision)
     {
         if (!damageDealt && fuseTime == -1)
@@ -64,7 +66,7 @@ public class Projectile : NetworkBehaviour
     private float timer = 0;
     private void Update()
     {  
-        if (timer < 30)
+        if (timer < maxLifetime)
         {
             timer += Time.deltaTime;
         }
@@ -96,6 +98,7 @@ public class Projectile : NetworkBehaviour
         BaseExplode(); 
     }
     public float explodeRadius = -1;
+    public LayerMask collideMask;
     private void BaseExplode()
     { 
         if (explosionEffect != null)
@@ -103,16 +106,37 @@ public class Projectile : NetworkBehaviour
             Instantiate(explosionEffect, transform.position, Quaternion.identity);
         }
         if (real)
-        {
+        { 
             int maxColliders = 20;
             Collider[] hitColliders = new Collider[maxColliders];
             int numColliders = Physics.OverlapSphereNonAlloc(transform.position, explodeRadius, hitColliders);
             for (int i = 0; i < numColliders; i++)
-            { 
-                if (hitColliders[i].TryGetComponent(out Hurtbox hurtbox))
+            {
+                for (int j = -1; j <= 1; j++)
                 {
-                    hurtbox.DealDamageUmbrella(damage);
-                }
+                    Ray ray = new(transform.position + new Vector3(0, 0.5f, 0), (hitColliders[i].transform.position + hitColliders[i].transform.up * 0.75f * j) - transform.position);
+                    if (Physics.Raycast(ray, out RaycastHit hit, explodeRadius, collideMask, QueryTriggerInteraction.Ignore))
+                    {
+                        //if we hit the collider
+                        if (hit.collider == hitColliders[i])
+                        {
+                            if (hitColliders[i].TryGetComponent(out Hurtbox hurtbox))
+                            {
+                                if (hurtbox.soldier != null && hurtbox.soldier.body != null)
+                                {
+                                    hurtbox.soldier.body.AddExplosionForce(500, transform.position, explodeRadius);
+                                }
+                                Debug.DrawLine(transform.position, hit.point, Color.red, 10);
+                                hurtbox.DealDamageUmbrella(damage);
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            Debug.DrawLine(transform.position, hit.point, Color.white, 10);
+                        }
+                    }
+                }  
             } 
         }
         if (dig != null) dig.ExplodeTerrain();
@@ -121,7 +145,7 @@ public class Projectile : NetworkBehaviour
     [SerializeField] private ProjectileTerrainDig dig;
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(transform.position, explodeRadius);
+        //Gizmos.DrawWireSphere(transform.position, explodeRadius);
     }
 
     [ClientRpc]

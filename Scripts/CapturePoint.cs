@@ -50,7 +50,7 @@ public class CapturePoint : NetworkBehaviour
         balanceOfPower = 0; 
         for (int i = presentSoldiers.Count - 1; i >= 0; i--)
         { 
-            if (presentSoldiers[i] == null)
+            if (presentSoldiers[i] == null || !presentSoldiers[i].alive)
             {
                 presentSoldiers.RemoveAt(i);
             }
@@ -66,8 +66,11 @@ public class CapturePoint : NetworkBehaviour
                     balanceOfPower += 1;
                 }
             }
-        } 
+        }
+        spriteRenderer.color = colors[holdingTeam.Value];
     }
+    public List<Color> colors;
+    public SpriteRenderer spriteRenderer;
     private void SwitchTeam()
     {
         if (holdingTeam.Value == 0)

@@ -9,9 +9,9 @@ public class ArmyBase : NetworkBehaviour
     [SerializeField] private AISoldier artilleryPrefab;
     [SerializeField] private List<Transform> spawnPoints;
 
-    [SerializeField] private List<AISoldier> spawnedSoldiers;
+    public List<AISoldier> spawnedSoldiers;
     private readonly int maxSoldiers = 50; //not including players...
-    private readonly int artilleryPerWave = 5;
+    private readonly int artilleryPerWave = 10; 
     public override void OnNetworkSpawn()
     { 
         if (IsServer)
@@ -19,18 +19,21 @@ public class ArmyBase : NetworkBehaviour
             InvokeRepeating(nameof(ReinforcementWave), 0, 60);
         }
     }
-    private void ReinforcementWave()
-    {
+    public void CullDeadSoldiers()
+    { 
         //clear empty spots
 
-        for (int i = spawnedSoldiers.Count-1; i >= 0; i--)
+        for (int i = spawnedSoldiers.Count - 1; i >= 0; i--)
         {
-            if (spawnedSoldiers[i] == null)
+            if (!spawnedSoldiers[i].hurtbox.alive)
             {
                 spawnedSoldiers.RemoveAt(i);
             }
         }
-
+    }
+    private void ReinforcementWave()
+    {
+        CullDeadSoldiers();
         int x = 0;
         foreach (Transform item in spawnPoints)
         {
@@ -62,6 +65,7 @@ public class ArmyBase : NetworkBehaviour
             soldier.hurtbox.team.Value = team;
             soldier.SetLayers();
             spawnedSoldiers.Add(soldier);
+
         } 
     }
     /// <summary>

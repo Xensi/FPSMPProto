@@ -11,6 +11,7 @@ public class Hurtbox : NetworkBehaviour
     private const int initialHP = 100;
     [SerializeField] private GameObject player;
     [SerializeField] private List<Transform> playerObjectsToChangeLayers; //assign visuals 
+    public AISoldier soldier;
     public override void OnNetworkSpawn()
     { 
         Respawn();
@@ -64,12 +65,28 @@ public class Hurtbox : NetworkBehaviour
             }
         }
     }
+    public bool alive = true;
     private void AICheckIfDead()
     {
-        if (HP.Value <= 0)
+        if (HP.Value <= 0 && alive)
         {
-            Destroy(player.gameObject);
+            alive = false;
+            if (soldier != null)
+            {
+                soldier.body.useGravity = true;
+                soldier.body.isKinematic = false;
+                soldier.body.drag = 0.1f;
+                soldier.body.angularDrag = 1f;
+                soldier.body.constraints = RigidbodyConstraints.None;
+                soldier.pathfinder.enabled = false;
+                soldier.enabled = false;
+                Invoke(nameof(DestroyThis), 60);
+            }
         }
+    }
+    private void DestroyThis()
+    {
+        Destroy(player.gameObject);
     }
     private void PlayerCheckIfDead()
     {

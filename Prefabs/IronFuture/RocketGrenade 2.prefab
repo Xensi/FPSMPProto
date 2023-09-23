@@ -102,15 +102,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: f004b602fcc6f6e4aa5b75fc0a550467, type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: f004b602fcc6f6e4aa5b75fc0a550467, type: 3}
       propertyPath: m_LocalScale.y
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: f004b602fcc6f6e4aa5b75fc0a550467, type: 3}
       propertyPath: m_LocalScale.z
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: f004b602fcc6f6e4aa5b75fc0a550467, type: 3}
       propertyPath: m_LocalPosition.x
@@ -197,6 +197,14 @@ PrefabInstance:
       value: 0.11
       objectReference: {fileID: 0}
     - target: {fileID: 2136153870529764277, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2136153870529764277, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: m_Center.z
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2136153870529764277, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 13400000, guid: 8c43730f6b77e0047a1c323463a37ac9, type: 2}
@@ -209,12 +217,16 @@ PrefabInstance:
       value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: maxLifetime
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: stopOnImpact
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: explodeRadius
-      value: 5
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: explodeOnImpact
@@ -223,7 +235,11 @@ PrefabInstance:
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: explosionEffect
       value: 
-      objectReference: {fileID: 7227745483280444750, guid: 8c10c985e4198a942837b0f5d380f29b, type: 3}
+      objectReference: {fileID: 7227745483280444750, guid: a80d2a959c07bb54fb586949f422dbd8, type: 3}
+    - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: collideMask.m_Bits
+      value: 19656
+      objectReference: {fileID: 0}
     - target: {fileID: 3497340478110618072, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 951099334
@@ -273,8 +289,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6896243210885016122, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: m_Time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6896243210885016122, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Autodestruct
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6896243210885016122, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 0.52369475
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects:

@@ -254,8 +254,7 @@ public class BasicShoot : NetworkBehaviour
     }
     private void ShootProjectile(bool real, Vector3 randomOffset, Vector3 bodyVelocity = default, float charge = 0)  
     {
-        Projectile proj = Instantiate(projectile, muzzle.transform.position, Quaternion.identity);
-        float force = switcher.activeWeaponType.data.force;
+        Projectile proj = Instantiate(projectile, muzzle.transform.position, Quaternion.identity); 
         proj.damage = damage;
 
         proj.body.velocity = bodyVelocity;

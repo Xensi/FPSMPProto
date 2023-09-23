@@ -12,6 +12,8 @@ public class SpawnSoldier : NetworkBehaviour
     private GameObject lookDesignator;
     public LayerMask designatorMask;
     public LayerMask lookDesignatorMask;
+    public Hurtbox hurtbox;
+    public float spread = 3;
     public override void OnNetworkSpawn()
     {
         designator = Instantiate(designatorPrefab, transform.position, Quaternion.identity);
@@ -21,11 +23,7 @@ public class SpawnSoldier : NetworkBehaviour
         lookDesignator.SetActive(false);
     }
     private void Update()
-    {
-        if (Input.GetMouseButtonDown(2))
-        {
-            SpawnSoldierUmbrella();
-        }
+    { 
         if (Input.GetKeyDown(KeyCode.Q))
         {
             ClearTargets();
@@ -38,11 +36,19 @@ public class SpawnSoldier : NetworkBehaviour
         { 
             CommandGoToTarget();
         }
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyUp(KeyCode.C))
+        {
+            ChargeCommand();
+        }
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            RetreatCommand();
+        }
+        /*if (Input.GetKeyDown(KeyCode.E))
         {
             FollowMe();
-        }
-        if (Input.GetKeyDown(KeyCode.F))
+        }*/
+        /*if (Input.GetKeyDown(KeyCode.F))
         {
             ClearLookTargets();
         }
@@ -53,7 +59,68 @@ public class SpawnSoldier : NetworkBehaviour
         if (Input.GetKeyUp(KeyCode.F))
         {
             LookInThatDirection();
+        }*/
+    }
+    private Vector3 lastDestination;
+    private void SpreadOut()
+    {
+
+    }
+    private void ChargeCommand()
+    {
+        ArmyBase armyBase; // to charge towards
+        Transform chargeTowards;
+        float offset = 1;
+        float offsetAmount = 100 * 0.45f;
+        if (hurtbox.team.Value == 0)
+        {
+            armyBase = Global.Instance.base0;
+            chargeTowards = GameWinChecker.Instance.nextCapZone0;
+            offset = -1;
         }
+        else
+        {
+            armyBase = Global.Instance.base1;
+            chargeTowards = GameWinChecker.Instance.nextCapZone1;
+        }
+        Vector3 destination = chargeTowards.transform.position + new Vector3(0, 0, offsetAmount * offset);
+        SoldiersGoToDestination(armyBase, destination);
+    }
+    private void SoldiersGoToDestination(ArmyBase ourBase, Vector3 destination)
+    {
+        ourBase.CullDeadSoldiers();
+        //generate line formation
+        int x = 0;
+        int _unitWidth = ourBase.spawnedSoldiers.Count;
+        var middleOffset = new Vector3(_unitWidth * 0.5f * spread, 0, 0);
+        foreach (AISoldier item in ourBase.spawnedSoldiers)
+        {
+            item.movementState = AISoldier.MovementStates.MovingToCommandedPosition;
+            Vector3 pos = destination;
+            pos += new Vector3(x * spread, 0, 0);
+            pos -= middleOffset;
+            item.destPos = pos;
+            x++;
+        }
+        lastDestination = destination;
+    }
+    private void RetreatCommand()
+    { 
+        ArmyBase armyBase; // to charge towards 
+        float offset = 1;
+        float offsetAmount = 100 * 0.45f;
+        if (hurtbox.team.Value == 0)
+        {
+            armyBase = Global.Instance.base0; 
+            offset = 1;
+        }
+        else
+        {
+            armyBase = Global.Instance.base1;
+            offset = -1;
+        }
+        Vector3 destination = armyBase.transform.position + new Vector3(0, 0, offsetAmount * offset);
+        SoldiersGoToDestination(armyBase, destination);
     }
     private void ShowLookTarget()
     {
@@ -109,30 +176,17 @@ public class SpawnSoldier : NetworkBehaviour
         }
     }
     private void CommandGoToTarget()
-    {
-        //generate line formation
-        int x = 0;
-        int _unitWidth = ownedSoldiers.Count;
-        float spread = 2;
-        var middleOffset = new Vector3(_unitWidth * 0.5f, 0, 0);
-        foreach (AISoldier item in ownedSoldiers)
+    {   
+        ArmyBase armyBase;
+        if (hurtbox.team.Value == 0)
         {
-            item.movementState = AISoldier.MovementStates.MovingToCommandedPosition;
-
-            var pos = new Vector3(x, 0, 0); 
-
-            pos -= middleOffset;
-
-            pos += designator.transform.position;
-
-            //pos += GetNoise(pos);
-
-            pos *= spread;
-
-            //item.target = designator.transform;
-            item.destPos = pos;
-            x++;
+            armyBase = Global.Instance.base0;
         }
+        else
+        {
+            armyBase = Global.Instance.base1;
+        }
+        SoldiersGoToDestination(armyBase, designator.transform.position);
     } 
     public Vector3 GetNoise(Vector3 pos)
     {
@@ -141,8 +195,7 @@ public class SpawnSoldier : NetworkBehaviour
 
         return new Vector3(noise, 0, noise);
     }
-    public Hurtbox hurtbox;
-    private void SpawnSoldierUmbrella() 
+    /*private void SpawnSoldierUmbrella() 
     { //only server can spawn
         if (IsServer)
         {
@@ -170,5 +223,5 @@ public class SpawnSoldier : NetworkBehaviour
             soldier.netObj.SpawnWithOwnership(clientId); 
         }
     //server puts new soldier in client's list
-    }  
+    }  */
 }
