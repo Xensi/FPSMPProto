@@ -51,6 +51,7 @@ public class BasicShoot : NetworkBehaviour
         {
             accumulatedSpread = Mathf.Clamp(accumulatedSpread -= Time.deltaTime * recoveryScale, baseSpread, maxSpread);
         }
+        //Debug.DrawRay(muzzle.transform.position, transform.forward * 2, Color.blue);
     }
     private void PlayerControl()
     { 
@@ -158,7 +159,7 @@ public class BasicShoot : NetworkBehaviour
     private void ClientShoot() //shoot raycast at target client side
     {
         switcher.SubtractAmmo(ammoPerShot);
-        ProjectileUmbrella(inheritMomentum);
+        ProjectileOverlord(inheritMomentum);
         ShowGunCosmeticEffects();
         SuppressAI();
     }
@@ -182,40 +183,49 @@ public class BasicShoot : NetworkBehaviour
             }
         } 
     }
-    private void ProjectileUmbrella(bool inheritVelocity = false)
-    {
+    private void ProjectileOverlord(bool inheritVelocity = false)
+    { 
         for (int i = 0; i < pelletsPerShot; i++)
         {
             float charge = chargedFloat;
             Vector3 bodyVel = body.velocity;
             Vector3 randomOffset = new(Random.Range(-accumulatedSpread, accumulatedSpread), Random.Range(-accumulatedSpread, accumulatedSpread), Random.Range(-accumulatedSpread, accumulatedSpread));
             accumulatedSpread += spreadPerShot;
+
             if (inheritVelocity)
             {
-                ShootProjectile(IsServer, randomOffset, bodyVel, charge); //server has the "real" (damaging) projectile
-                if (IsServer)
-                {
-                    InheritProjectileClientRpc(randomOffset, bodyVel, charge); //server tells clients about projectile
-                }
-                else
-                {
-                    InheritProjectileServerRpc(randomOffset, bodyVel, charge);//ask server to tell clients
-                }
+                InheritProjectileUmbrella(randomOffset, bodyVel, charge);
             }
             else
             {
-                ShootProjectile(IsServer, randomOffset); //server has the "real" (damaging) projectile
-                if (IsServer)
-                {
-                    ProjectileClientRpc(randomOffset); //server tells clients about projectile
-                }
-                else
-                {
-                    ProjectileServerRpc(randomOffset);//ask server to tell clients
-                }
-            } 
+                ProjectileUmbrella(randomOffset);
+            }
+        }
+    } 
+    private void InheritProjectileUmbrella(Vector3 randomOffset, Vector3 bodyVel, float charge)
+    {
+        ShootProjectile(IsServer, randomOffset, bodyVel, charge); //server has the "real" (damaging) projectile
+        if (IsServer)
+        {
+            InheritProjectileClientRpc(randomOffset, bodyVel, charge); //server tells clients about projectile
+        }
+        else
+        {
+            InheritProjectileServerRpc(randomOffset, bodyVel, charge);//ask server to tell clients
         }
     }
+    private void ProjectileUmbrella(Vector3 randomOffset)
+    {
+        ShootProjectile(IsServer, randomOffset); //server has the "real" (damaging) projectile
+        if (IsServer)
+        {
+            ProjectileClientRpc(randomOffset); //server tells clients about projectile
+        }
+        else
+        {
+            ProjectileServerRpc(randomOffset);//ask server to tell clients
+        }
+    } 
     [ClientRpc]
     private void InheritProjectileClientRpc(Vector3 randomOffset, Vector3 bodyVel, float charge)
     {
@@ -245,6 +255,7 @@ public class BasicShoot : NetworkBehaviour
     private void ShootProjectile(bool real, Vector3 randomOffset, Vector3 bodyVelocity = default, float charge = 0)  
     {
         Projectile proj = Instantiate(projectile, muzzle.transform.position, Quaternion.identity);
+        float force = switcher.activeWeaponType.data.force;
         proj.damage = damage;
 
         proj.body.velocity = bodyVelocity;

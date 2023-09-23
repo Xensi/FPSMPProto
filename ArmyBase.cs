@@ -6,7 +6,12 @@ public class ArmyBase : NetworkBehaviour
 {
     public int team = 0;
     [SerializeField] private AISoldier soldierPrefab;
+    [SerializeField] private AISoldier artilleryPrefab;
     [SerializeField] private List<Transform> spawnPoints;
+
+    [SerializeField] private List<AISoldier> spawnedSoldiers;
+    private readonly int maxSoldiers = 50; //not including players...
+    private readonly int artilleryPerWave = 5;
     public override void OnNetworkSpawn()
     { 
         if (IsServer)
@@ -16,26 +21,48 @@ public class ArmyBase : NetworkBehaviour
     }
     private void ReinforcementWave()
     {
+        //clear empty spots
+
+        for (int i = spawnedSoldiers.Count-1; i >= 0; i--)
+        {
+            if (spawnedSoldiers[i] == null)
+            {
+                spawnedSoldiers.RemoveAt(i);
+            }
+        }
+
+        int x = 0;
         foreach (Transform item in spawnPoints)
         {
-            SpawnSoldierUmbrella(item);
+            if (spawnedSoldiers.Count < maxSoldiers)
+            { 
+                if (x < artilleryPerWave)
+                { 
+                    SpawnSoldierUmbrella(item, artilleryPrefab);
+                }
+                else
+                {
+                    SpawnSoldierUmbrella(item, soldierPrefab);
+                }
+                x++;
+            }
+            else
+            {
+                break;
+            }
         }
     }
-    private void SpawnSoldierUmbrella(Transform trans)
+    private void SpawnSoldierUmbrella(Transform trans, AISoldier prefab)
     { //only server can spawn
         if (IsServer)
         {
-            AISoldier soldier = Instantiate(soldierPrefab, trans.position, Quaternion.identity);
+            AISoldier soldier = Instantiate(prefab, trans.position, Quaternion.identity);
             //soldier.netObj.SpawnWithOwnership(OwnerClientId);
             soldier.netObj.Spawn();
             soldier.hurtbox.team.Value = team;
             soldier.SetLayers();
-        }
-        /*else
-        {
-            //tell server to spawn
-            SpawnSoldierServerRpc();
-        }*/
+            spawnedSoldiers.Add(soldier);
+        } 
     }
     /// <summary>
     /// Non-server client tells server to spawn in a minion and grant ownership to the client.

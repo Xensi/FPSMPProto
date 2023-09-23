@@ -27,7 +27,7 @@ public class Projectile : NetworkBehaviour
                     {
                         if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
                         {
-                            Debug.Log(collision.gameObject.name);
+                            //Debug.Log(collision.gameObject.name);
                             hurtbox.DealDamageUmbrella(damage);
                         }
                     }
@@ -36,7 +36,7 @@ public class Projectile : NetworkBehaviour
                 {
                     if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
                     {
-                        Debug.Log(collision.gameObject.name);
+                        //Debug.Log(collision.gameObject.name);
                         hurtbox.DealDamageUmbrella(damage);
                     }
                 } 
@@ -64,7 +64,7 @@ public class Projectile : NetworkBehaviour
     private float timer = 0;
     private void Update()
     {  
-        if (timer < 10)
+        if (timer < 30)
         {
             timer += Time.deltaTime;
         }

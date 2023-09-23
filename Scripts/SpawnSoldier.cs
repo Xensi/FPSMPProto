@@ -109,13 +109,37 @@ public class SpawnSoldier : NetworkBehaviour
         }
     }
     private void CommandGoToTarget()
-    { 
+    {
         //generate line formation
+        int x = 0;
+        int _unitWidth = ownedSoldiers.Count;
+        float spread = 2;
+        var middleOffset = new Vector3(_unitWidth * 0.5f, 0, 0);
         foreach (AISoldier item in ownedSoldiers)
         {
             item.movementState = AISoldier.MovementStates.MovingToCommandedPosition;
-            item.target = designator.transform;
+
+            var pos = new Vector3(x, 0, 0); 
+
+            pos -= middleOffset;
+
+            pos += designator.transform.position;
+
+            //pos += GetNoise(pos);
+
+            pos *= spread;
+
+            //item.target = designator.transform;
+            item.destPos = pos;
+            x++;
         }
+    } 
+    public Vector3 GetNoise(Vector3 pos)
+    {
+        float _noise = 0.5f;
+        var noise = Mathf.PerlinNoise(pos.x * _noise, pos.z * _noise);
+
+        return new Vector3(noise, 0, noise);
     }
     public Hurtbox hurtbox;
     private void SpawnSoldierUmbrella() 

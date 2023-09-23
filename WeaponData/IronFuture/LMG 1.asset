@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db33296f778c2584fa72bd8fb98f6d79, type: 3}
   m_Name: LMG 1
   m_EditorClassIdentifier: 
-  timeBetweenShots: 0.125
+  timeBetweenShots: 0.1
   gunSound: {fileID: 8300000, guid: e3548aa6ef4d95d4bbaa217962c9db1f, type: 3}
   reloadSound: {fileID: 0}
   baseSpread: 0.01
-  spreadPerShot: 0.01
-  maxSpread: 0
+  spreadPerShot: 0.02
+  maxSpread: 0.1
   recoveryScale: 0.1
   pelletsPerShot: 1
   damage: 20
@@ -33,3 +33,4 @@ MonoBehaviour:
   joltY: 25
   joltZ: 25
   joltReturnSpeed: 50
+  aiIndirectFire: 0

@@ -15,7 +15,7 @@ MonoBehaviour:
   timeBetweenShots: 0.15
   gunSound: {fileID: 8300000, guid: 9723b0ab07dcb8545b762e1c8a2fc64d, type: 3}
   reloadSound: {fileID: 8300000, guid: 5f0ebcb646df79b4f9f155185357849a, type: 3}
-  baseSpread: 0.02
+  baseSpread: 0.01
   spreadPerShot: 0.025
   maxSpread: 0.1
   recoveryScale: 0.1

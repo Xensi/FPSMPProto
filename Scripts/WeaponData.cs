@@ -19,8 +19,15 @@ public class WeaponData : ScriptableObject
     public int ammoPerShot = 1;
     public int reloadTime = 1;
     public int magSize = 8;
+
+    [Header("Jolt Settings")]
     public float joltX = -25;
     public float joltY = 25;
     public float joltZ = 25;
     public float joltReturnSpeed = 50;
+
+    [Header("AI Behavior")]
+    public bool aiIndirectFire = false;
+    public float aiRatio = 0.5f;
+
 }

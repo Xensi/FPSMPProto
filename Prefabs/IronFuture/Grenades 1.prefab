@@ -236,6 +236,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1006b1aba6e469741a6ccfc6e0a8bb92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strength: 0.1
-  brushWidth: 2
-  brushHeight: 3
+  strength: 0.01
+  brushWidth: 1
+  brushHeight: 1

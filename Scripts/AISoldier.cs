@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Unity.Netcode;
 using Pathfinding;
@@ -32,7 +33,8 @@ public class AISoldier : NetworkBehaviour
 		TakingCover,
 		RunningFromGrenade,
 		MovingToCommandedPosition, //moving to commanded position, while still fighting
-		ChargingForward
+		ChargingForward,
+		FrozenPosition //for static emplacement soldiers
 	}
 	public MovementStates movementState = MovementStates.ChargingForward;
 	public enum FiringStates
@@ -63,8 +65,9 @@ public class AISoldier : NetworkBehaviour
 		{
 			ai = GetComponent<IAstarAI>();
 			if (ai != null) ai.onSearchPath += Update; 
-			spawner = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<SpawnSoldier>();
-			spawner.ownedSoldiers.Add(this); //fix this so that soldiers are added to specific players
+			//soldiers do not start out owned by anyone? save for player's starting retinue
+			//spawner = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<SpawnSoldier>();
+			//spawner.ownedSoldiers.Add(this); //fix this so that soldiers are added to specific players
 		}
         else //if not owner, assume is enemy
         { 
@@ -84,7 +87,7 @@ public class AISoldier : NetworkBehaviour
 		var children = root.GetComponentsInChildren<Transform>(includeInactive: true);
 		foreach (var child in children)
 		{
-			Debug.Log(child.name);
+			//Debug.Log(child.name);
 			child.gameObject.layer = layer;
 		}
 	}
@@ -125,9 +128,9 @@ public class AISoldier : NetworkBehaviour
 	} 
 	public void GetSuppressed()
 	{
-		if (Random.Range(1, 11) <= 3)
+		if (UnityEngine.Random.Range(1, 11) <= 3)
         { 
-			suppressionTimer = Mathf.Clamp(suppressionTimer += Random.Range(1, 3), 0, 5);
+			suppressionTimer = Mathf.Clamp(suppressionTimer += UnityEngine.Random.Range(1, 3), 0, 5);
 		}
 	}
 	void Update()
@@ -161,7 +164,8 @@ public class AISoldier : NetworkBehaviour
 		{
 			closestCoverPos = null;
 		}
-	}
+	} 
+	public ThrowData throwData;  
 	private void UpdateStates()
 	{
         switch (movementState)
@@ -181,11 +185,20 @@ public class AISoldier : NetworkBehaviour
                 }
                 break;
             case MovementStates.MovingToCommandedPosition:
-                FollowTransform();
+                GoToPosition();
                 break;
             case MovementStates.ChargingForward:
-				target = Global.Instance.directionOfBattle;
-				FollowTransform();
+                if (hurtbox.team.Value == 0)
+                {
+                    target = GameWinChecker.Instance.nextCapZone0;
+                }
+                else
+                {
+                    target = GameWinChecker.Instance.nextCapZone1;
+                }
+                FollowTransform();
+                break;
+            case MovementStates.FrozenPosition:
                 break;
             default:
                 break;
@@ -200,11 +213,12 @@ public class AISoldier : NetworkBehaviour
                     ScanForEnemy();
 					if (hurtbox.team.Value == 0)
                     {
+						RotateTowardsDirection(eyes, Global.Instance.directionOfBattle.forward, rotationSpeed);
 						eyes.rotation = Quaternion.LookRotation(Vector3.RotateTowards(eyes.forward, Global.Instance.directionOfBattle.forward, Time.deltaTime * rotationSpeed, 0));
 					}
                     else
-                    {
-						eyes.rotation = Quaternion.LookRotation(Vector3.RotateTowards(eyes.forward, -Global.Instance.directionOfBattle.forward, Time.deltaTime * rotationSpeed, 0));
+					{
+						RotateTowardsDirection(eyes, -Global.Instance.directionOfBattle.forward, rotationSpeed);
 					} 
 				}
                 else
@@ -212,35 +226,55 @@ public class AISoldier : NetworkBehaviour
                     firingState = FiringStates.FiringAtEnemies;
                 } 
                 break;
-            case FiringStates.FiringAtEnemies: //shooting at enemy   
+            case FiringStates.FiringAtEnemies: //shooting at enemy    
 				standState = StandStates.Standing;
 				CheckIfNeedReload();
                 if (focusEnemy != null)
-                {
-                    //raycast to see if enemy is still visible to us: 
-                    Vector3 heading = focusEnemy.transform.position - eyes.position;
-                    bool val = Physics.Raycast(eyes.position, heading, out RaycastHit hit, Mathf.Infinity, mask, QueryTriggerInteraction.Ignore);
-                    if (val && hit.collider == focusEnemy) //if still visible
+				{
+					Vector3 heading = focusEnemy.transform.position - eyes.position;
+					if (switcher.activeWeaponType.data.aiIndirectFire)
                     {
-                        Debug.DrawRay(eyes.position, heading * hit.distance, Color.red);
-                        RotateTowardsTransform(eyes, focusEnemy.transform, rotationSpeed); //rotate towards enemy
-                        if (Vector3.Dot(heading.normalized, eyes.forward.normalized) > .9f) //if pointing in direction of enemy, shoot
-                        {
-                            if (switcher.activeWeaponType.availableAmmo > 0)
-                            {
-                                if (shooter != null)
-                                {
-                                    shooter.AIShoot();
-                                }
-                            }
-                        }
-                    }
-                    else //lost them ...
+						RotateTowardsTransform(eyes, focusEnemy.transform, rotationSpeed); //rotate towards enemy
+						if (Vector3.Dot(heading.normalized, eyes.forward.normalized) > .9f) //if eyes is pointing in direction of enemy
+						{ 
+							throwData = CalculateFiringAngle(focusEnemy.transform.position, shooter.muzzle.transform.position, switcher.activeWeaponType.data.force, switcher.activeWeaponType.data.aiRatio);
+							if (throwData.valid)
+							{ 
+								if (weaponParent != null)
+								{
+									//Vector3 angleVector = Quaternion.AngleAxis(throwData.Angle, weaponParent.right) * eyes.forward.normalized;
+									Vector3 angleVector = throwData.ThrowVelocity.normalized;
+									Debug.DrawRay(transform.position, angleVector);
+									RotateTowardsDirection(weaponParent, angleVector, rotationSpeed);
+
+									if (Vector3.Dot(angleVector, weaponParent.forward.normalized) > .9f) //if weapon matches angle
+									{ 
+										TryToShoot();
+									}
+								}
+							}
+						}
+					}
+                    else
                     {
-                        Debug.DrawRay(eyes.position, heading, Color.white);
-                        focusEnemy = null;
-                        //state = States.SearchingForEnemies;
-                    }
+						//raycast to see if enemy is still visible to us: 
+						bool val = Physics.Raycast(eyes.position, heading, out RaycastHit hit, Mathf.Infinity, mask, QueryTriggerInteraction.Ignore);
+						if (val && hit.collider == focusEnemy) //if still visible
+						{
+							//Debug.DrawRay(eyes.position, heading * hit.distance, Color.red);
+							RotateTowardsTransform(eyes, focusEnemy.transform, rotationSpeed); //rotate towards enemy
+							if (Vector3.Dot(heading.normalized, eyes.forward.normalized) > .9f) //if pointing in direction of enemy, shoot
+							{
+								TryToShoot();
+							}
+						}
+						else //lost them ...
+						{
+							Debug.DrawRay(eyes.position, heading, Color.white);
+							focusEnemy = null;
+							//state = States.SearchingForEnemies;
+						}
+					} 
                 }
                 else
                 {
@@ -276,7 +310,102 @@ public class AISoldier : NetworkBehaviour
 			default:
 				break;
 		}
-    }
+	}
+	/// <summary>
+	/// Throw Velocity, Angle
+	/// </summary>
+	[Serializable]
+	public struct ThrowData
+	{
+		public bool valid;
+		public Vector3 ThrowVelocity;
+		public float Angle;
+		public float DeltaXZ;
+		public float DeltaY;
+	}
+
+	public ThrowData CalculateFiringAngle(Vector3 TargetPosition, Vector3 StartPosition, float MaxThrowForce, float ForceRatio = 1) //force ratio 0 is lowest possible force, 1 is max
+	{
+		// v = initial velocity, assume max speed for now
+		// x = distance to travel on X/Z plane only
+		// y = difference in altitudes from thrown point to target hit point
+		// g = gravity
+
+		Vector3 displacement = new Vector3(
+			TargetPosition.x,
+			StartPosition.y,
+			TargetPosition.z
+		) - StartPosition;
+		float deltaY = TargetPosition.y - StartPosition.y;
+		float deltaXZ = displacement.magnitude;
+
+		// find lowest initial launch velocity with other magic formula from https://en.wikipedia.org/wiki/Projectile_motion
+		// v^2 / g = y + sqrt(y^2 + x^2)
+		// meaning.... v = sqrt(g * (y+ sqrt(y^2 + x^2)))
+		float gravity = Mathf.Abs(Physics.gravity.y);
+		float throwStrength = Mathf.Clamp(
+			Mathf.Sqrt(
+				gravity
+				* (deltaY + Mathf.Sqrt(Mathf.Pow(deltaY, 2)
+				+ Mathf.Pow(deltaXZ, 2)))),
+			0.01f,
+			MaxThrowForce
+		);
+		throwStrength = Mathf.Lerp(throwStrength, MaxThrowForce, ForceRatio);
+
+		float angle;
+		if (ForceRatio == 0)
+		{
+			// optimal angle is chosen with a relatively simple formula
+			angle = Mathf.PI / 2f - (0.5f * (Mathf.PI / 2 - (deltaY / deltaXZ)));
+		}
+		else
+		{
+			// when we know the initial velocity, we have to calculate it with this formula
+			// Angle to throw = arctan((v^2 +- sqrt(v^4 - g * (g * x^2 + 2 * y * v^2)) / g*x)
+			angle = Mathf.Atan(
+				(Mathf.Pow(throwStrength, 2) - Mathf.Sqrt(
+					Mathf.Pow(throwStrength, 4) - gravity
+					* (gravity * Mathf.Pow(deltaXZ, 2)
+					+ 2 * deltaY * Mathf.Pow(throwStrength, 2)))
+				) / (gravity * deltaXZ)
+			);
+		}
+
+		if (float.IsNaN(angle))
+		{
+			// you will need to handle this case when there
+			// is no feasible angle to throw the object and reach the target.
+			return new ThrowData
+			{
+				valid = false
+			};
+		}
+
+		Vector3 initialVelocity =
+			Mathf.Cos(angle) * throwStrength * displacement.normalized
+			+ Mathf.Sin(angle) * throwStrength * Vector3.up;
+
+		return new ThrowData
+		{
+			valid = true,
+			ThrowVelocity = initialVelocity,
+			Angle = angle,
+			DeltaXZ = deltaXZ,
+			DeltaY = deltaY
+		};
+	}
+	private void TryToShoot()
+    {
+		if (switcher.activeWeaponType.availableAmmo > 0)
+		{
+			if (shooter != null)
+			{ 
+				shooter.AIShoot();
+			}
+		}
+	}
+	[SerializeField] private Transform weaponParent;
     private float grenadeTimer = 0;
 	private void SearchForClosestUnoccupiedCoverPosition()
 	{
@@ -301,7 +430,7 @@ public class AISoldier : NetworkBehaviour
 			}
 		}
 	} 
-	Vector3 destPos;
+	public Vector3 destPos;
 	public void RunAwayFromGrenade(Collider col)
 	{
 		Vector3 heading = col.transform.position - transform.position;
@@ -366,5 +495,9 @@ public class AISoldier : NetworkBehaviour
 	private void RotateTowardsTransform(Transform toRotate, Transform target, float rotationSpeed)
     {
 		toRotate.rotation = Quaternion.LookRotation(Vector3.RotateTowards(toRotate.forward, target.position - toRotate.position, Time.deltaTime * rotationSpeed, 0));
+	}
+	private void RotateTowardsDirection(Transform toRotate, Vector3 direction, float rotationSpeed)
+	{
+		toRotate.rotation = Quaternion.LookRotation(Vector3.RotateTowards(toRotate.forward, direction, Time.deltaTime * rotationSpeed, 0)); 
 	}
 }

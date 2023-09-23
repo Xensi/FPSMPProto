@@ -25,12 +25,13 @@ public class SimpleMatchmaking : MonoBehaviour
     private UnityTransport _transport;
     private const string JoinCodeKey = "j";
     private string _playerId;
+    public bool autoJoin = false;
 
     private void Awake()
     {
         _transport = FindObjectOfType<UnityTransport>(); 
         //automatically join lobby on loading game
-        CreateOrJoinLobby();
+        if (autoJoin) CreateOrJoinLobby();
     }
 
     public async void CreateOrJoinLobby()

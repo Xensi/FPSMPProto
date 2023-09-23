@@ -47,19 +47,26 @@ public class CapturePoint : NetworkBehaviour
     }
     private void EvaluateBalanceOfPower()
     {
-        balanceOfPower = 0;
-        foreach (Hurtbox item in presentSoldiers)
-        {
-            int team = item.team.Value;
-            if (team == holdingTeam.Value)
+        balanceOfPower = 0; 
+        for (int i = presentSoldiers.Count - 1; i >= 0; i--)
+        { 
+            if (presentSoldiers[i] == null)
             {
-                balanceOfPower -= 1;
+                presentSoldiers.RemoveAt(i);
             }
             else
-            {
-                balanceOfPower += 1;
+            { 
+                int team = presentSoldiers[i].team.Value;
+                if (team == holdingTeam.Value)
+                {
+                    balanceOfPower -= 1;
+                }
+                else
+                {
+                    balanceOfPower += 1;
+                }
             }
-        }
+        } 
     }
     private void SwitchTeam()
     {

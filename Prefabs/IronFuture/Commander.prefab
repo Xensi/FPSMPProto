@@ -1966,11 +1966,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultPos: {x: 0, y: 0, z: 0}
   push: {x: 0, y: 0, z: 0}
-  joltX: -10
-  joltY: 10
-  joltZ: 10
+  joltX: -15
+  joltY: 15
+  joltZ: 15
   joltSnapSpeed: 6
-  joltReturnSpeed: 100
+  joltReturnSpeed: 50
 --- !u!1 &9002181891920181779
 GameObject:
   m_ObjectHideFlags: 0

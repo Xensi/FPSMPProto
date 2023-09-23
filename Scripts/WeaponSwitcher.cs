@@ -208,7 +208,7 @@ public class WeaponSwitcher : NetworkBehaviour
         shooter.jolt.joltX = weapon.joltX;
         shooter.jolt.joltY = weapon.joltY;
         shooter.jolt.joltZ = weapon.joltZ;
-        shooter.jolt.joltReturnSpeed = weapon.joltReturnSpeed;
+        shooter.jolt.joltReturnSpeed = weapon.joltReturnSpeed; 
         if (playerControlled)
         {
             gunText.text = weapon.name;
