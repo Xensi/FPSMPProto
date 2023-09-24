@@ -11,12 +11,13 @@ public class CapturePoint : NetworkBehaviour
     public int balanceOfPower = 0;
     public List<Hurtbox> presentSoldiers;
     //remove null soldiers
+
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
             holdingTeam.Value = startingTeam;
-        }
+        } 
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -69,17 +70,20 @@ public class CapturePoint : NetworkBehaviour
         }
         spriteRenderer.color = colors[holdingTeam.Value];
     }
-    public List<Color> colors;
+    public List<Color> colors;  
     public SpriteRenderer spriteRenderer;
     private void SwitchTeam()
     {
-        if (holdingTeam.Value == 0)
-        {
-            holdingTeam.Value = 1;
-        }
-        else
-        {
-            holdingTeam.Value = 0;
+        if (IsServer)
+        { 
+            if (holdingTeam.Value == 0)
+            {
+                holdingTeam.Value = 1;
+            }
+            else
+            {
+                holdingTeam.Value = 0;
+            }
         }
     }
 

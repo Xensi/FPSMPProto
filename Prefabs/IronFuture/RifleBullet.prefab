@@ -74,7 +74,12 @@ MonoBehaviour:
   id: 0
   firedByPlayer: 1
   bulletHole: {fileID: 1463032851187077470, guid: 391f4dfeaf4c3424fbfb3c61e548563e, type: 3}
+  maxLifetime: 10
   explodeRadius: -1
+  collideMask:
+    serializedVersion: 2
+    m_Bits: 0
+  dig: {fileID: 0}
 --- !u!54 &1551827702973853363
 Rigidbody:
   m_ObjectHideFlags: 0

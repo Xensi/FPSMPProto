@@ -275,7 +275,7 @@ public class BasicShoot : NetworkBehaviour
         Projectile proj = Instantiate(projectile, position, Quaternion.identity);
         proj.damage = damage;
         proj.transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
-        float force = switcher.activeWeaponType.data.force;
+        float force = switcher.activeWeaponType.data.force; // WILL NEED TO BE CHANGED LATER IF MULTIPLE WEAPONS AVAILABLE
         proj.body.AddForce(dir.normalized * force, ForceMode.Impulse); // * force
         proj.real = real;
         proj.id = OwnerClientId;

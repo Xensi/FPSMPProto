@@ -72,7 +72,7 @@ public class Projectile : NetworkBehaviour
         }
         else
         {
-            //Destroy(gameObject);
+            Destroy(gameObject);
         }
 
 
@@ -111,7 +111,7 @@ public class Projectile : NetworkBehaviour
             DealExplosionDamage(position);
         }
         if (dig != null) dig.ExplodeTerrain(position);
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
     private void DealExplosionDamage(Vector3 position)
     {

@@ -299,7 +299,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 1
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -1447,6 +1447,7 @@ MonoBehaviour:
   - {fileID: 511227989131902766}
   - {fileID: 5192026574502567468}
   - {fileID: 7879960937432458512}
+  - {fileID: 5423454085641514684}
 --- !u!81 &511227989131902766
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1649,6 +1650,7 @@ MonoBehaviour:
   switcher: {fileID: 6561933035523379178}
   force: 10
   inheritMomentum: 0
+  fixedFiringPosition: {fileID: 0}
   chargedFloatCap: 1
   chargedFloat: 0
   camJolt: {fileID: 1828460560043313355}
