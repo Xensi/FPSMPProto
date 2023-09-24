@@ -569,7 +569,7 @@ MonoBehaviour:
   highPos: {fileID: 2379932305176888274}
   jumpPos: {fileID: 1997461112378579804}
   jolt: {fileID: 6659065980424095273}
-  movement: {fileID: 5192026574502567468}
+  movement: {fileID: 0}
 --- !u!1 &2925671442232918446
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,11 +635,15 @@ MonoBehaviour:
   playerControlled: 1
   HP:
     m_InternalValue: 0
+  team:
+    m_InternalValue: 0
   player: {fileID: 6462728764829847028}
   playerObjectsToChangeLayers:
   - {fileID: 8172274587895367532}
   - {fileID: 2131614782479823575}
   - {fileID: 8675860699166013642}
+  soldier: {fileID: 0}
+  alive: 1
 --- !u!114 &4772223642025077102
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1361,7 +1365,6 @@ GameObject:
   - component: {fileID: 7204163261661106160}
   - component: {fileID: 7656394865206341506}
   - component: {fileID: 6899519983608503980}
-  - component: {fileID: 5192026574502567468}
   - component: {fileID: 7072144441012091553}
   - component: {fileID: 511227989131902766}
   m_Layer: 6
@@ -1467,34 +1470,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5192026574502567468
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6462728764829847028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b79ea6a052541e04dbc00e16940ce651, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 2053761275609403919}
-  speed: {fileID: 956177003965510770}
-  body: {fileID: 7656394865206341506}
-  jumpDistance: 40
-  groundCheck: {fileID: 1449962462117053268}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 319
-  playerMovementState: 0
-  wallMask:
-    serializedVersion: 2
-    m_Bits: 63
-  keepUpright: {fileID: 8675860699166013642}
-  canWallRun: 1
-  camJoltRef: {fileID: 0}
-  capsule: {fileID: 0}
 --- !u!114 &7072144441012091553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1508,7 +1483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   behaviours:
-  - {fileID: 5192026574502567468}
+  - {fileID: 0}
   - {fileID: 6358525248013056049}
   - {fileID: 511227989131902766}
   - {fileID: 6705830122864838369}
@@ -1745,6 +1720,7 @@ MonoBehaviour:
   switcher: {fileID: 6561933035523379178}
   force: 10
   inheritMomentum: 0
+  fixedFiringPosition: {fileID: 0}
   chargedFloatCap: 1
   chargedFloat: 0
   camJolt: {fileID: 0}

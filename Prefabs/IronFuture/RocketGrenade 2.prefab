@@ -202,12 +202,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2136153870529764277, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Center.z
-      value: 0.35
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2136153870529764277, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Material
       value: 
-      objectReference: {fileID: 13400000, guid: 8c43730f6b77e0047a1c323463a37ac9, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: dig
       value: 

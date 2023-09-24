@@ -1313,7 +1313,7 @@ GameObject:
   - component: {fileID: 7443572228560708810}
   - component: {fileID: 7443572228560708811}
   - component: {fileID: 7443572228560708808}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1449,7 +1449,7 @@ MonoBehaviour:
   - {fileID: 7587804367352692200}
   - {fileID: 1931015970888302535}
   spawnedSoldiers: []
-  cam: {fileID: 0}
+  spawnSoldiers: 0
 --- !u!114 &7443572228560708808
 MonoBehaviour:
   m_ObjectHideFlags: 0

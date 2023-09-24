@@ -1489,8 +1489,6 @@ MonoBehaviour:
   player: {fileID: 6462728764829847028}
   playerObjectsToChangeLayers:
   - {fileID: 8172274587895367532}
-  - {fileID: 0}
-  - {fileID: 0}
   soldier: {fileID: 0}
   alive: 1
 --- !u!1 &6943025712402035770
@@ -1876,6 +1874,11 @@ MonoBehaviour:
   - data: {fileID: 11400000, guid: 5ab753ab6f7c2d24391ad8aa378e973e, type: 2}
     visualsToShow: {fileID: 5663311986684535595}
     muzzleFlash: {fileID: 117427854847237351}
+    availableAmmo: 0
+    spareAmmo: 0
+  - data: {fileID: 11400000, guid: c04f0870b09242f44bac527dd6b0db9a, type: 2}
+    visualsToShow: {fileID: 4894409187779571294}
+    muzzleFlash: {fileID: 1692187394671457096}
     availableAmmo: 0
     spareAmmo: 0
   shooter: {fileID: 2388376419523812764}
@@ -2904,6 +2907,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
+--- !u!198 &1692187394671457096 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 2917385771113552373, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}
+  m_PrefabInstance: {fileID: 4541732471570016957}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1692187394689809532 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2917385771132950209, guid: b054c25b6897d0b4c937c82448cc77bf, type: 3}

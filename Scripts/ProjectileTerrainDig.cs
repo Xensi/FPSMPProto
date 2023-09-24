@@ -8,10 +8,10 @@ public class ProjectileTerrainDig : MonoBehaviour
     public int brushWidth = 2;
     public int brushHeight = 2;
     private Terrain _targetTerrain; 
-    public void ExplodeTerrain()
+    public void ExplodeTerrain(Vector3 position)
     {
         _targetTerrain = Global.Instance.terrain;
-        LowerTerrain(transform.position, strength, brushWidth, brushHeight); 
+        LowerTerrain(position, strength, brushWidth, brushHeight); 
     }
     public void LowerTerrain(Vector3 worldPosition, float strength, int brushWidth, int brushHeight)
     {

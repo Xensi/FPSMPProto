@@ -8,6 +8,26 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 307138541877162212, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 307138541877162212, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.51
+      objectReference: {fileID: 0}
+    - target: {fileID: 307138541877162212, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 307138541877162212, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 307138541877162212, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1905458914979944401, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
       propertyPath: weaponTypes.Array.size
       value: 1
@@ -15,7 +35,7 @@ PrefabInstance:
     - target: {fileID: 1905458914979944401, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
       propertyPath: weaponTypes.Array.data[0].data
       value: 
-      objectReference: {fileID: 11400000, guid: c04f0870b09242f44bac527dd6b0db9a, type: 2}
+      objectReference: {fileID: 11400000, guid: edb0f84be0828aa48be4fb1fee5ad800, type: 2}
     - target: {fileID: 4097907284816366616, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 951099334

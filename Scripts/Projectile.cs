@@ -72,7 +72,7 @@ public class Projectile : NetworkBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
         }
 
 
@@ -86,61 +86,66 @@ public class Projectile : NetworkBehaviour
         }
     }
     private void ExplodeUmbrella()
-    { 
+    {
+        Vector3 position = transform.position;
+        BaseExplode(position);
         if (IsServer)
         {
-            ExplodeClientRpc();
+            ExplodeClientRpc(position);
         }
         else
         {
-            ExplodeServerRpc();
+            ExplodeServerRpc(position);
         }
-        BaseExplode(); 
     }
     public float explodeRadius = -1;
     public LayerMask collideMask;
-    private void BaseExplode()
+    private void BaseExplode(Vector3 position)
     { 
         if (explosionEffect != null)
         {
-            Instantiate(explosionEffect, transform.position, Quaternion.identity);
+            Instantiate(explosionEffect, position, Quaternion.identity);
         }
         if (real)
-        { 
-            int maxColliders = 20;
-            Collider[] hitColliders = new Collider[maxColliders];
-            int numColliders = Physics.OverlapSphereNonAlloc(transform.position, explodeRadius, hitColliders);
-            for (int i = 0; i < numColliders; i++)
-            {
-                for (int j = -1; j <= 1; j++)
-                {
-                    Ray ray = new(transform.position + new Vector3(0, 0.5f, 0), (hitColliders[i].transform.position + hitColliders[i].transform.up * 0.75f * j) - transform.position);
-                    if (Physics.Raycast(ray, out RaycastHit hit, explodeRadius, collideMask, QueryTriggerInteraction.Ignore))
-                    {
-                        //if we hit the collider
-                        if (hit.collider == hitColliders[i])
-                        {
-                            if (hitColliders[i].TryGetComponent(out Hurtbox hurtbox))
-                            {
-                                if (hurtbox.soldier != null && hurtbox.soldier.body != null)
-                                {
-                                    hurtbox.soldier.body.AddExplosionForce(500, transform.position, explodeRadius);
-                                }
-                                Debug.DrawLine(transform.position, hit.point, Color.red, 10);
-                                hurtbox.DealDamageUmbrella(damage);
-                            }
-                            break;
-                        }
-                        else
-                        {
-                            Debug.DrawLine(transform.position, hit.point, Color.white, 10);
-                        }
-                    }
-                }  
-            } 
+        {
+            DealExplosionDamage(position);
         }
-        if (dig != null) dig.ExplodeTerrain();
-        Destroy(gameObject);
+        if (dig != null) dig.ExplodeTerrain(position);
+        //Destroy(gameObject);
+    }
+    private void DealExplosionDamage(Vector3 position)
+    {
+        int maxColliders = 20;
+        Collider[] hitColliders = new Collider[maxColliders];
+        int numColliders = Physics.OverlapSphereNonAlloc(position, explodeRadius, hitColliders);
+        for (int i = 0; i < numColliders; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                Ray ray = new(position + new Vector3(0, 0.5f, 0), (hitColliders[i].transform.position + hitColliders[i].transform.up * 0.75f * j) - position);
+                if (Physics.Raycast(ray, out RaycastHit hit, explodeRadius, collideMask, QueryTriggerInteraction.Ignore))
+                {
+                    //if we hit the collider
+                    if (hit.collider == hitColliders[i])
+                    {
+                        if (hitColliders[i].TryGetComponent(out Hurtbox hurtbox))
+                        {
+                            if (hurtbox.soldier != null && hurtbox.soldier.body != null)
+                            {
+                                hurtbox.soldier.body.AddExplosionForce(500, position, explodeRadius);
+                            }
+                            //Debug.DrawLine(position, hit.point, Color.red, 10);
+                            hurtbox.DealDamageUmbrella(damage);
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        Debug.DrawLine(position, hit.point, Color.white, 10);
+                    }
+                }
+            }
+        }
     }
     [SerializeField] private ProjectileTerrainDig dig;
     private void OnDrawGizmos()
@@ -149,16 +154,16 @@ public class Projectile : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void ExplodeClientRpc()
+    private void ExplodeClientRpc(Vector3 position)
     {
         if (!IsOwner)
         {
-            BaseExplode();
+            BaseExplode(position);
         }
     }
     [ServerRpc (RequireOwnership = false)]
-    private void ExplodeServerRpc()
+    private void ExplodeServerRpc(Vector3 position)
     {
-        ExplodeClientRpc();
+        ExplodeClientRpc(position);
     }
 }

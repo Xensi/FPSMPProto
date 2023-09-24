@@ -235,8 +235,8 @@ public class AISoldier : NetworkBehaviour
                 break;
             case FiringStates.FiringAtEnemies: //shooting at enemy    
 				standState = StandStates.Standing;
-				CheckIfNeedReload();
-                if (focusEnemy != null && focusEnemySoldier != null && focusEnemySoldier.hurtbox.alive)
+				CheckIfNeedReload(); 
+                if (focusEnemy != null && enemyHurtbox != null && enemyHurtbox.alive)
 				{
 					Vector3 heading = focusEnemy.transform.position - eyes.position;
 					if (switcher.activeWeaponType.data.aiIndirectFire)
@@ -306,7 +306,7 @@ public class AISoldier : NetworkBehaviour
                 break;
         }
         
-        UpdateSuppression(); 
+        //UpdateSuppression(); 
 		switch (standState)
 		{
 			case StandStates.Standing:
@@ -331,7 +331,7 @@ public class AISoldier : NetworkBehaviour
 		public float DeltaXZ;
 		public float DeltaY;
 	}
-
+	public Hurtbox enemyHurtbox;
 	public ThrowData CalculateFiringAngle(Vector3 TargetPosition, Vector3 StartPosition, float MaxThrowForce, float ForceRatio = 1) //force ratio 0 is lowest possible force, 1 is max
 	{
 		// v = initial velocity, assume max speed for now
@@ -459,7 +459,7 @@ public class AISoldier : NetworkBehaviour
     {
 		Gizmos.DrawWireSphere(transform.position, searchRadius);
     }
-	private AISoldier focusEnemySoldier;
+	public AISoldier focusEnemySoldier;
     private void ScanForEnemy()
     {
 		for (int j = -1; j <= 0; j++)
@@ -482,7 +482,7 @@ public class AISoldier : NetworkBehaviour
                             { 
 								//Debug.DrawRay(eyes.position, dir * hit.distance, Color.red);
 								focusEnemy = hit.collider;
-								focusEnemySoldier = box.soldier;
+								enemyHurtbox = box;
 							}
 						}
                     }
