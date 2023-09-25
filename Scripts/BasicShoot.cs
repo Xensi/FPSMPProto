@@ -33,6 +33,7 @@ public class BasicShoot : NetworkBehaviour
     public Transform fixedFiringPosition;
     public float chargedFloatCap = 1;
     [SerializeField] private Hurtbox hurtbox;
+    public bool allowedToShoot = true;
     private void Start()
     {
         weaponTimer = timeBetweenShots;
@@ -56,7 +57,8 @@ public class BasicShoot : NetworkBehaviour
         //Debug.DrawRay(muzzle.transform.position, transform.forward * 2, Color.blue);
     }
     private void PlayerControl()
-    { 
+    {
+        if (!allowedToShoot) return;
         if (Input.GetMouseButtonDown(0))
         {
             if (thrown)
@@ -94,7 +96,8 @@ public class BasicShoot : NetworkBehaviour
         }
     } 
     public void AIShoot()
-    { 
+    {
+        if (!allowedToShoot) return;
         if (weaponTimer >= timeBetweenShots && switcher.activeWeaponType.availableAmmo > 0)
         {
             weaponTimer = 0;

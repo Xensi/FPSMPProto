@@ -80,7 +80,8 @@ public class WeaponSwitcher : NetworkBehaviour
                 reloading = false;
                 PerformReload();
             }
-        } 
+        }
+        shooter.allowedToShoot = !reloading;
     }
     private void KeyPressSwitchWeapons()
     { 
@@ -165,8 +166,14 @@ public class WeaponSwitcher : NetworkBehaviour
     private void ClientSideSwitchWeapons(int id = 0)
     {
         SwitchToWeaponBase(id);
-        equippedWeaponID.Value = id; 
+        equippedWeaponID.Value = id;
+        CancelReload();
     } 
+    private void CancelReload()
+    {
+        reloading = false;
+        reloadTimer = 0;
+    }
     private void SwitchToWeaponBase(int id = 0)
     {
         shooter.chargedFloat = 0;

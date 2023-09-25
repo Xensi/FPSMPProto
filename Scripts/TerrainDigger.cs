@@ -17,9 +17,12 @@ public class TerrainDigger : MonoBehaviour
             {
                 if (Physics.Raycast(transform.position, transform.forward, out var hit, Mathf.Infinity))
                 {
-                    if (hit.transform.TryGetComponent(out Terrain terrain)) _targetTerrain = terrain;
+                    /*if (hit.transform.TryGetComponent(out Terrain terrain)) _targetTerrain = terrain;
                     LowerTerrain(hit.point, strength, brushWidth, brushHeight);
-                    Debug.DrawLine(transform.position, hit.point, Color.red, 2);
+                    Debug.DrawLine(transform.position, hit.point, Color.red, 2);*/
+
+                    Global.DigEvent dig = Global.Instance.AddDigEvent(hit.point, Global.DigType.Trench); //strength, brushWidth, brushHeight
+                    Global.Instance.DigClientRpc(hit.point, Global.DigType.Trench); //tell everybody to jot that down
                 }
             }
         }

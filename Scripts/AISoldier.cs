@@ -71,10 +71,10 @@ public class AISoldier : NetworkBehaviour
 			//spawner = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<SpawnSoldier>();
 			//spawner.ownedSoldiers.Add(this); //fix this so that soldiers are added to specific players
 		}
-        else //if not owner, assume is enemy
+        /*else //if not owner, assume is enemy
         { 
 			SoldierStorage.Instance.enemySoldiers.Add(this);
-		} 
+		} */
 	}
 	public void SetLayers()
     {
@@ -218,15 +218,16 @@ public class AISoldier : NetworkBehaviour
                 if (focusEnemy == null)
                 {
                     ScanForEnemy();
+					Vector3 dir;
 					if (hurtbox.team.Value == 0)
                     {
-						RotateTowardsDirection(eyes, Global.Instance.directionOfBattle.forward, rotationSpeed);
-						eyes.rotation = Quaternion.LookRotation(Vector3.RotateTowards(eyes.forward, Global.Instance.directionOfBattle.forward, Time.deltaTime * rotationSpeed, 0));
+						dir = Global.Instance.directionOfBattle.forward;
 					}
                     else
 					{
-						RotateTowardsDirection(eyes, -Global.Instance.directionOfBattle.forward, rotationSpeed);
-					} 
+						dir = -Global.Instance.directionOfBattle.forward;
+					}
+					RotateTowardsDirection(eyes, dir, rotationSpeed);
 				}
                 else
                 {
@@ -236,7 +237,7 @@ public class AISoldier : NetworkBehaviour
             case FiringStates.FiringAtEnemies: //shooting at enemy    
 				standState = StandStates.Standing;
 				CheckIfNeedReload(); 
-                if (focusEnemy != null && enemyHurtbox != null && enemyHurtbox.alive)
+                if (focusEnemy != null && enemyHurtbox != null && enemyHurtbox.alive && enemyHurtbox.team.Value != hurtbox.team.Value)
 				{
 					Vector3 heading = focusEnemy.transform.position - eyes.position;
 					if (switcher.activeWeaponType.data.aiIndirectFire)

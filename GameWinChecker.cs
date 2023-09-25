@@ -8,6 +8,9 @@ public class GameWinChecker : MonoBehaviour
     public bool gameStarted = false;
     public static GameWinChecker Instance { get; private set; }
 
+    public Transform nextCapZone0;
+    public Transform nextCapZone1;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -45,10 +48,7 @@ public class GameWinChecker : MonoBehaviour
     private void Start()
     {
         InvokeRepeating(nameof(DefineNextCapZone), 0, 1);
-    }
-
-    public Transform nextCapZone0;
-    public Transform nextCapZone1; 
+    } 
     private void DefineNextCapZone()
     {
         //for team 0, next capture point is a point that doesn't match their team

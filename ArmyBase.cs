@@ -5,6 +5,7 @@ using Unity.Netcode;
 public class ArmyBase : NetworkBehaviour
 {
     public int team = 0;
+    [SerializeField] private List<AISoldier> soldierPrefabs;
     [SerializeField] private AISoldier soldierPrefab;
     [SerializeField] private AISoldier artilleryPrefab;
     [SerializeField] private List<Transform> spawnPoints;
@@ -14,6 +15,7 @@ public class ArmyBase : NetworkBehaviour
     private readonly int maxSoldiers = 50; //not including players...
     private readonly int artilleryPerWave = 10;
     public bool spawnSoldiers = false;
+    public List<Transform> playerSpawns;
     public override void OnNetworkSpawn()
     { 
         if (IsServer)
@@ -57,6 +59,12 @@ public class ArmyBase : NetworkBehaviour
                 break;
             }
         }
+    }
+    public void RecruitSoldier(int type = 0)
+    {
+        Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Count)];
+        AISoldier prefab = soldierPrefabs[type];
+        SpawnSoldierUmbrella(spawn, prefab);
     }
     private void SpawnSoldierUmbrella(Transform trans, AISoldier prefab)
     { //only server can spawn

@@ -9,7 +9,7 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     [SerializeField] protected TMP_Text speed;
     public Rigidbody body;
     [SerializeField] protected float jumpDistance = 40f;
-    [SerializeField] private float defaultSpeed = 36f;
+    public float defaultSpeed = 36f;
     protected float sprintMult = 1.3f;
     public float groundRadius = 0.35f; //radius 
     protected bool isGrounded;

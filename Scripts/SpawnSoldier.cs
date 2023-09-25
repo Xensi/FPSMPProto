@@ -21,18 +21,28 @@ public class SpawnSoldier : NetworkBehaviour
 
         lookDesignator = Instantiate(lookDesignatorPrefab, transform.position, Quaternion.identity);
         lookDesignator.SetActive(false);
+
+        if (hurtbox.team.Value == 0)
+        {
+            ourBase = Global.Instance.base0;
+        }
+        else
+        {
+            ourBase = Global.Instance.base1;
+        }
+        RetreatCommand();
     }
     private void Update()
     { 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             ClearTargets();
         }
-        if (Input.GetKey(KeyCode.Q)) //display target marker
+        if (Input.GetKey(KeyCode.E)) //display target marker
         {
             ShowTarget();
         }
-        if (Input.GetKeyUp(KeyCode.Q))
+        if (Input.GetKeyUp(KeyCode.E))
         { 
             CommandGoToTarget();
         }
@@ -40,7 +50,7 @@ public class SpawnSoldier : NetworkBehaviour
         {
             ChargeCommand();
         }
-        if (Input.GetKeyUp(KeyCode.E))
+        if (Input.GetKeyUp(KeyCode.F))
         {
             RetreatCommand();
         }
@@ -60,35 +70,37 @@ public class SpawnSoldier : NetworkBehaviour
         {
             LookInThatDirection();
         }*/
+        RepeatCommand();
     }
     private Vector3 lastDestination;
+    private void RepeatCommand()
+    { 
+        SoldiersGoToDestination(lastDestination);
+    }
     private void SpreadOut()
     {
 
     }
     private void ChargeCommand()
-    {
-        ArmyBase armyBase; // to charge towards
+    { 
         Transform chargeTowards;
         float offset = 1;
         float offsetAmount = 100 * 1f;
         if (hurtbox.team.Value == 0)
-        {
-            armyBase = Global.Instance.base0;
-            //chargeTowards = GameWinChecker.Instance.nextCapZone0;
+        {  
             chargeTowards = Global.Instance.base1.transform;
             offset = -1;
         }
         else
-        {
-            armyBase = Global.Instance.base1;
-            //chargeTowards = GameWinChecker.Instance.nextCapZone1;
+        { 
             chargeTowards = Global.Instance.base0.transform;
         }
         Vector3 destination = chargeTowards.transform.position + new Vector3(0, 0, offsetAmount * offset);
-        SoldiersGoToDestination(armyBase, destination);
+        lastDestination = destination;
+        //SoldiersGoToDestination(destination);
     }
-    private void SoldiersGoToDestination(ArmyBase ourBase, Vector3 destination)
+    private ArmyBase ourBase;
+    private void SoldiersGoToDestination(Vector3 destination)
     {
         ourBase.CullDeadSoldiers();
         //generate line formation
@@ -104,25 +116,27 @@ public class SpawnSoldier : NetworkBehaviour
             item.destPos = pos;
             x++;
         }
-        lastDestination = destination;
     }
     private void RetreatCommand()
-    { 
-        ArmyBase armyBase; // to charge towards 
+    {  
         float offset = 1;
         float offsetAmount = 100 * 0.45f;
         if (hurtbox.team.Value == 0)
-        {
-            armyBase = Global.Instance.base0; 
+        { 
             offset = 1;
         }
         else
-        {
-            armyBase = Global.Instance.base1;
+        { 
             offset = -1;
         }
-        Vector3 destination = armyBase.transform.position + new Vector3(0, 0, offsetAmount * offset);
-        SoldiersGoToDestination(armyBase, destination);
+        Vector3 destination = ourBase.transform.position + new Vector3(0, 0, offsetAmount * offset);
+        lastDestination = destination;
+        //SoldiersGoToDestination(destination);
+    }
+    private void CommandGoToTarget()
+    {
+        lastDestination = designator.transform.position;
+        //SoldiersGoToDestination(designator.transform.position);
     }
     private void ShowLookTarget()
     {
@@ -177,19 +191,6 @@ public class SpawnSoldier : NetworkBehaviour
             designator.transform.position = hit.point;
         }
     }
-    private void CommandGoToTarget()
-    {   
-        ArmyBase armyBase;
-        if (hurtbox.team.Value == 0)
-        {
-            armyBase = Global.Instance.base0;
-        }
-        else
-        {
-            armyBase = Global.Instance.base1;
-        }
-        SoldiersGoToDestination(armyBase, designator.transform.position);
-    } 
     public Vector3 GetNoise(Vector3 pos)
     {
         float _noise = 0.5f;

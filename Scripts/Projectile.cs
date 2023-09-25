@@ -43,11 +43,18 @@ public class Projectile : NetworkBehaviour
                 }
                 if (collision.collider.TryGetComponent(out Hurtbox hurtbox)) //effects on hitting something that can be damaged
                 {
-                    if (firedByPlayer) //projectiles fired by players always deal damage
-                    {
-                        if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
+                    if (firedByPlayer) //projectiles fired by players can't hurt players on own team
+                    { 
+                        if (hurtbox.team.Value == team && hurtbox.playerControlled) //same team and player can't be damaged
                         {
-                            hurtbox.DealDamageUmbrella(damage);
+
+                        }
+                        else
+                        { 
+                            if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
+                            {
+                                hurtbox.DealDamageUmbrella(damage);
+                            }
                         }
                     }
                     else if (hurtbox.team.Value != team) //projectiles fired by ai can only damage enemies
@@ -79,6 +86,13 @@ public class Projectile : NetworkBehaviour
         {
             ExplodeUmbrella();
         }
+        RotateTowardsMovement();
+    }
+    private void RotateTowardsMovement()
+    {
+        Vector3 dir = body.velocity.normalized;
+        float speed = body.velocity.magnitude;
+        transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, dir, speed * Time.deltaTime, 0));
     }
     private void ExplodeUmbrella()
     {
@@ -131,7 +145,7 @@ public class Projectile : NetworkBehaviour
                             //Debug.DrawLine(position, hit.point, Color.red, 10);
                             //calculate damage
                             float modifier = hit.distance / explodeRadius;
-                            int distanceDamage = Mathf.Clamp(Mathf.RoundToInt(damage * modifier), 0, 999);
+                            int distanceDamage = Mathf.Clamp(Mathf.RoundToInt(damage - (damage * modifier)), 0, 999);
                             //Debug.Log(distanceDamage);
                             hurtbox.DealDamageUmbrella(distanceDamage);
                         }

@@ -10,8 +10,12 @@ public class Global : NetworkBehaviour
     public Transform directionOfBattle;
     public ArmyBase base0;
     public ArmyBase base1;
+    public NetworkVariable<int> moneyBase0 = new(); 
+    public NetworkVariable<int> moneyBase1 = new();
     //list of terrain dig events to be sent to joining clients, held only serverside
-    public List<DigEvent> digEvents; 
+    public List<DigEvent> digEvents;
+    public List<Color> teamColors;
+    public GameObject pauseParent;
     private void Awake()
     {  
         if (Instance != null && Instance != this)
@@ -23,11 +27,82 @@ public class Global : NetworkBehaviour
             Instance = this;
         } 
     }
+    private void Start()
+    {
+        pauseParent.SetActive(false);
+    }
+    private bool pauseShown = false;
     private void Update()
     { 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        { 
+            if (pauseShown)
+            {
+                pauseShown = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                pauseParent.SetActive(false);
+            }
+            else
+            {
+                pauseShown = true;
+                Cursor.lockState = CursorLockMode.None;
+                pauseParent.SetActive(true);
+            }
+        }
+        
     }
     public override void OnNetworkSpawn()
     {
+        if (IsServer)
+        {
+            moneyBase0.Value = 0;
+            moneyBase1.Value = 0;
+            InvokeRepeating(nameof(PayBases), 0, 30);
+        }
+    }
+    private void PayBases()
+    {
+        if (IsServer)
+        {
+            int payout = 100;
+            moneyBase0.Value += payout;
+            moneyBase1.Value += payout;
+        }
+    } 
+    public void RecruitInfantry(int type = 0)
+    {
+        //get team
+        int team = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<Hurtbox>().team.Value;
+
+        RecruitServerRpc(team, type);
+    }
+    [ServerRpc]
+    private void RecruitServerRpc(int team, int type)
+    {
+        ArmyBase armyBase;
+        if (team == 0)
+        {
+            armyBase = base0;
+        }
+        else
+        {
+            armyBase = base1;
+        }
+
+        armyBase.RecruitSoldier(type);
+        //infantry = 0, artillery = 1 
+    }
+    public void SwitchTeam()
+    {
+        //get id of the client that wants to switch teams
+        ulong id = NetworkManager.LocalClient.ClientId; 
+        TellClientToSwitchServerRpc(id);
+    } 
+    [ServerRpc]
+    public void TellClientToSwitchServerRpc(ulong id)
+    {
+        Hurtbox box = NetworkManager.ConnectedClients[id].PlayerObject.GetComponentInChildren<Hurtbox>();
+        box.SwitchTeam();
     }
     [ClientRpc]
     public void DigClientRpc(Vector3 position, DigType type)
@@ -72,8 +147,8 @@ public class Global : NetworkBehaviour
                 LowerTerrain(dig.position, .001f, 2, 2);
                 break;
             case DigType.Trench:
-                Debug.LogError("not implemented");
-                //LowerTerrain(position, .001f, 2, 2);
+                //Debug.LogError("not implemented");
+                LowerTerrain(dig.position, .002f, 2, 2);
                 break;
             default:
                 break;

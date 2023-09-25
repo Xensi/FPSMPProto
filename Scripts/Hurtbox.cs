@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.UI;
 //not disabled per player: exists all the time
 public class Hurtbox : NetworkBehaviour
 { 
@@ -11,18 +12,70 @@ public class Hurtbox : NetworkBehaviour
     private const int initialHP = 100;
     [SerializeField] private GameObject player;
     [SerializeField] private List<Transform> playerObjectsToChangeLayers; //assign visuals 
-    public AISoldier soldier;
+    public AISoldier soldier; 
+    public SpriteRenderer teamSprite;
+    [SerializeField] private AdvancedPlayerMovement playerMovement;
+
+    private int bandages = 3;
+    private float bandageTimer = 0;
+    private float bandageFinishTime = 3;
+    public bool alive = true;
+
+    private float maxBleedOutTime = 10;
+    private float reduceBleedOutOnHit = 1;
+    private float bleedOutTimer = -999;
+    [SerializeField] private ParticleSystem bloodEffect;
+    [SerializeField] private Slider bleedOutSlider;
+    [SerializeField] private Slider bandageSlider;
+
+    private void Start()
+    { 
+        if (bleedOutSlider != null)
+        {
+            bleedOutSlider.maxValue = maxBleedOutTime;
+            bleedOutSlider.value = maxBleedOutTime;
+            bleedOutSlider.gameObject.SetActive(false);
+        }
+        if (bandageSlider != null)
+        {
+            bandageSlider.maxValue = bandageFinishTime;
+            bandageSlider.value = 0;
+            bandageSlider.gameObject.SetActive(false);
+        }
+        UpdateTeamColor();
+
+    }
+    public void SwitchTeam()
+    { 
+        if (team.Value == 0)
+        {
+            team.Value = 1;
+        }
+        else
+        {
+            team.Value = 0;
+        }
+        UpdateTeamColor();
+        Respawn();
+    }
+    private void UpdateTeamColor()
+    { 
+        if (teamSprite != null)
+        {
+            teamSprite.color = Global.Instance.teamColors[team.Value];
+        }
+    }
     public override void OnNetworkSpawn()
+    {
+        Respawn();
+    }
+    private void Respawn()
     {
         if (bloodEffect != null)
         {
             bloodEffect.Stop();
             bloodEffect.gameObject.SetActive(false);
         }
-        Respawn();
-    }
-    private void Respawn()
-    {
         if (IsServer)
         {
             HP.Value = initialHP;
@@ -45,7 +98,16 @@ public class Hurtbox : NetworkBehaviour
     {
         if (IsOwner)
         {
-            player.transform.position = RespawnManager.Instance.respawnPoints[Random.Range(0, RespawnManager.Instance.respawnPoints.Count)].position; 
+            ArmyBase armyBase;
+            if (team.Value == 0)
+            {
+                armyBase = Global.Instance.base0;
+            }
+            else
+            {
+                armyBase = Global.Instance.base1;
+            }
+            player.transform.position = armyBase.playerSpawns[Random.Range(0, armyBase.playerSpawns.Count)].position; 
         }
         else
         {
@@ -70,6 +132,50 @@ public class Hurtbox : NetworkBehaviour
             }*/
             UpdateBleedOut();
         }
+        if (Input.GetKey(KeyCode.Q) && bandages > 0 && bleedOutTimer != -999) //slow while healing
+        {
+            if (bandageTimer < bandageFinishTime)
+            {
+                bandageTimer += Time.deltaTime;
+                if (bandageSlider != null)
+                {
+                    bandageSlider.value = bandageTimer;
+                    bandageSlider.gameObject.SetActive(true);
+                }
+                if (playerMovement != null)
+                {
+                    playerMovement.moveSpeed = playerMovement.defaultSpeed / 3;
+                }
+            }
+            else
+            {
+                bandages--;
+                bandageTimer = 0;
+                FinishApplyingBandage();
+                if (bandageSlider != null)
+                {
+                    bandageSlider.value = 0;
+                    bandageSlider.gameObject.SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            bandageTimer = 0;
+            if (bandageSlider != null)
+            {
+                bandageSlider.value = 0;
+                bandageSlider.gameObject.SetActive(false);
+            }
+            if (playerMovement != null)
+            {
+                playerMovement.moveSpeed = playerMovement.defaultSpeed;
+            }
+        }
+    }
+    private void FinishApplyingBandage()
+    {
+        bleedOutTimer = -999; 
     }
     private void UpdateBleedOut()
     {
@@ -82,6 +188,12 @@ public class Hurtbox : NetworkBehaviour
             { 
                 bloodEffect.gameObject.SetActive(true);
                 bloodEffect.Play();
+            } 
+            if (bleedOutSlider != null)
+            {
+                bleedOutSlider.maxValue = maxBleedOutTime;
+                bleedOutSlider.value = bleedOutTimer;
+                bleedOutSlider.gameObject.SetActive(true);
             }
         }
         else if (bleedOutTimer <= 0 && bleedOutTimer > -999)
@@ -91,22 +203,33 @@ public class Hurtbox : NetworkBehaviour
             { 
                 bloodEffect.Stop();
                 bloodEffect.gameObject.SetActive(false);
-            }
+            } 
             FinishBleedingOut();
         }
         else
-        { 
+        {
+            if (bleedOutSlider != null)
+            {
+                bleedOutSlider.maxValue = maxBleedOutTime;
+                bleedOutSlider.value = maxBleedOutTime;
+                bleedOutSlider.gameObject.SetActive(false);
+            }
             if (bloodEffect != null)
             {
                 bloodEffect.Stop();
                 bloodEffect.gameObject.SetActive(false);
             }
-        }
+        } 
     }
     private void FinishBleedingOut()
-    { 
+    {
         if (playerControlled)
-        { 
+        {
+            if (bleedOutSlider != null)
+            {
+                bleedOutSlider.maxValue = maxBleedOutTime;
+                bleedOutSlider.value = maxBleedOutTime;
+            }
             SpawnRandom();
         }
         else
@@ -119,7 +242,7 @@ public class Hurtbox : NetworkBehaviour
         if (bleedOutTimer == -999)
         {
             bleedOutTimer = maxBleedOutTime - reduceBleedOutOnHit;
-            Debug.Log(bleedOutTimer);
+            //Debug.Log(bleedOutTimer);
         }
         else
         {
@@ -143,11 +266,6 @@ public class Hurtbox : NetworkBehaviour
             Invoke(nameof(DestroyThis), 60);
         }
     }
-    public bool alive = true;
-
-    private float maxBleedOutTime = 10;
-    private float reduceBleedOutOnHit = 1; 
-    private float bleedOutTimer = -999;
     private void AICheckIfDead()
     {
         if (HP.Value <= 0 && alive)
@@ -180,12 +298,14 @@ public class Hurtbox : NetworkBehaviour
     {
         SpawnRandom();
     }
-    [SerializeField] private ParticleSystem bloodEffect;
 
     public void DealDamageUmbrella(int damage)
     {
-        float adjusted = damage / maxBleedOutTime;
-        GetHitBleedOut(adjusted);
+        if (alive)
+        {
+            float adjusted = damage / maxBleedOutTime;
+            GetHitBleedOut(adjusted); 
+        }
        /* if (IsServer) //server can write network variables
         {
             DealDamage(damage);
