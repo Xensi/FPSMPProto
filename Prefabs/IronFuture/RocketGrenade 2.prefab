@@ -164,6 +164,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: f004b602fcc6f6e4aa5b75fc0a550467, type: 3}
   m_PrefabInstance: {fileID: 4435104355970378000}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4435104355970412464 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: f004b602fcc6f6e4aa5b75fc0a550467, type: 3}
+  m_PrefabInstance: {fileID: 4435104355970378000}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6617281778223235443
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -220,6 +225,10 @@ PrefabInstance:
       propertyPath: maxLifetime
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: hideOnImpact
+      value: 
+      objectReference: {fileID: 4435104355970412464}
     - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: stopOnImpact
       value: 1
@@ -290,11 +299,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6896243210885016122, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Time
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6896243210885016122, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Autodestruct
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6896243210885016122, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
@@ -428,9 +437,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectile: {fileID: 8841976647714836687}
-  strength: 0.001
-  brushWidth: 2
-  brushHeight: 2
 --- !u!114 &8841976647714836687 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}

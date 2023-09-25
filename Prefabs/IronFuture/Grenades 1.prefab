@@ -236,6 +236,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1006b1aba6e469741a6ccfc6e0a8bb92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strength: 0.01
-  brushWidth: 1
-  brushHeight: 1
+  projectile: {fileID: 8841976647714836687}
+--- !u!114 &8841976647714836687 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+  m_PrefabInstance: {fileID: 6617281778223235443}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875355839841793601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 999f64eeb1fd63a4587848f218391861, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

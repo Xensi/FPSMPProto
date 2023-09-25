@@ -68,7 +68,7 @@ public class Global : NetworkBehaviour
         switch (dig.type)
         {
             case DigType.Artillery:
-                Debug.LogError("Digging");
+                //Debug.LogError("Digging");
                 LowerTerrain(dig.position, .001f, 2, 2);
                 break;
             case DigType.Trench:
@@ -94,7 +94,7 @@ public class Global : NetworkBehaviour
             for (var x = 0; x < brushSize.x; x++)
             {
                 heights[y, x] -= strength;// * Time.deltaTime;
-                Debug.Log(heights[y, x]);
+                //Debug.Log(heights[y, x]);
             }
         }
         terrainData.SetHeights(brushPosition.x, brushPosition.y, heights);

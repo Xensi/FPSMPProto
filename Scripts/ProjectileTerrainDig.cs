@@ -10,7 +10,7 @@ public class ProjectileTerrainDig : NetworkBehaviour
     //public int brushHeight = 2; 
     public void ExplodeTerrain(Vector3 position)
     { 
-        if (projectile.real)
+        if (projectile != null && projectile.real)
         {
             Global.DigEvent dig = Global.Instance.AddDigEvent(position, Global.DigType.Artillery); //strength, brushWidth, brushHeight
             Global.Instance.DigClientRpc(position, Global.DigType.Artillery); //tell everybody to jot that down

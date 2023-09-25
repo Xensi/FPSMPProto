@@ -20,7 +20,7 @@ MonoBehaviour:
   maxSpread: 0
   recoveryScale: 0.1
   pelletsPerShot: 1
-  damage: 50
+  damage: 10
   projectile: {fileID: 2405006166133232060, guid: 90ec577d499484348b300a5540a436cf, type: 3}
   force: 2
   inheritMomentum: 0
@@ -33,3 +33,5 @@ MonoBehaviour:
   joltY: 25
   joltZ: 25
   joltReturnSpeed: 50
+  aiIndirectFire: 0
+  aiRatio: 0.5

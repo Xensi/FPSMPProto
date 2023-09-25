@@ -31,11 +31,12 @@ public class BasicShoot : NetworkBehaviour
     public float force = 10;
     public bool inheritMomentum = false;
     public Transform fixedFiringPosition;
+    public float chargedFloatCap = 1;
+    [SerializeField] private Hurtbox hurtbox;
     private void Start()
     {
         weaponTimer = timeBetweenShots;
     }
-    public float chargedFloatCap = 1;
     private void Update()
     {
         if (!IsOwner) return;
@@ -278,7 +279,8 @@ public class BasicShoot : NetworkBehaviour
         float force = switcher.activeWeaponType.data.force; // WILL NEED TO BE CHANGED LATER IF MULTIPLE WEAPONS AVAILABLE
         proj.body.AddForce(dir.normalized * force, ForceMode.Impulse); // * force
         proj.real = real;
-        proj.id = OwnerClientId;
+        //proj.id = OwnerClientId;
+        proj.team = hurtbox.team.Value;
         proj.firedByPlayer = playerControlled; 
     }
     /*private void ShootProjectile(bool real, Vector3 dir, Vector3 position, Vector3 bodyVelocity = default, float charge = 0)  

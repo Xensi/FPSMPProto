@@ -20,7 +20,7 @@ MonoBehaviour:
   maxSpread: 1
   recoveryScale: 0.1
   pelletsPerShot: 1
-  damage: 0
+  damage: 100
   projectile: {fileID: 8841976647714836687, guid: f702d5e956b11d84686f227406a5bad5, type: 3}
   force: 100
   inheritMomentum: 0

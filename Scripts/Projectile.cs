@@ -14,56 +14,53 @@ public class Projectile : NetworkBehaviour
     public bool real = true;
     public ParticleSystem explosionEffect;
     public ulong id = 0;
+    public int team = 0;
     public bool firedByPlayer = true;
     [SerializeField] private GameObject bulletHole;
     public float maxLifetime = 10;
+    [SerializeField] private GameObject hideOnImpact;
+    private float timer = 0;
+    [SerializeField] private ProjectileTerrainDig dig;
+    public float explodeRadius = -1;
+    public LayerMask collideMask;
     private void OnCollisionEnter(Collision collision)
     {
-        if (!damageDealt && fuseTime == -1)
+        ContactPoint contact = collision.GetContact(0);
+        if (!damageDealt && fuseTime == -1) //no damage dealt and no fuse
         {
-            if (collision.collider.TryGetComponent(out Hurtbox hurtbox)) //effects on hitting something that can be damaged
+            damageDealt = true; 
+            if (stopOnImpact) body.drag = Mathf.Infinity;
+            if (explodeOnImpact) //impact grenade
             { 
-                if (hurtbox.playerControlled)
-                { 
-                    if (firedByPlayer && hurtbox.OwnerClientId != id || !firedByPlayer) //either a player hit another player that isn't themselves, or it was fired by an ai
+                ExplodeUmbrella();
+            }
+            else //bullet
+            {
+                if (bulletHole != null)
+                {
+                    GameObject obj = Instantiate(bulletHole, transform.position, Quaternion.FromToRotation(Vector3.forward, -contact.normal));
+                    obj.transform.parent = collision.transform;
+                }
+                if (collision.collider.TryGetComponent(out Hurtbox hurtbox)) //effects on hitting something that can be damaged
+                {
+                    if (firedByPlayer) //projectiles fired by players always deal damage
                     {
                         if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
                         {
-                            //Debug.Log(collision.gameObject.name);
+                            hurtbox.DealDamageUmbrella(damage);
+                        }
+                    }
+                    else if (hurtbox.team.Value != team) //projectiles fired by ai can only damage enemies
+                    {
+                        if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
+                        {
                             hurtbox.DealDamageUmbrella(damage);
                         }
                     }
                 }
-                else
-                {
-                    if (real) //only the one shot by server is real, the rest are cosmetic and don't actually deal damage
-                    {
-                        //Debug.Log(collision.gameObject.name);
-                        hurtbox.DealDamageUmbrella(damage);
-                    }
-                } 
-            }
-            if (bulletHole != null)
-            {
-                 
-                ContactPoint contact = collision.GetContact(0);
-                GameObject obj = Instantiate(bulletHole, transform.position, Quaternion.FromToRotation(Vector3.forward, -contact.normal));
-                obj.transform.parent = collision.transform;
-
-                /*GameObject hitParticleEffect = Instantiate(hitParticles, hit.point, Quaternion.FromToRotation(Vector3.up, hit.normal)); //create a particle effect on shot
-                    GameObject bulletHole = Instantiate(bulletImpact, hit.point, Quaternion.FromToRotation(Vector3.forward, hit.normal)); //create a bullet hole on shot
-                    hitParticleEffect.transform.SetParent(hit.transform); //connect to object that was hit
-                    bulletHole.transform.SetParent(hit.transform);*/
-            }
-            damageDealt = true;
-            if (stopOnImpact) body.drag = Mathf.Infinity;
-            if (explodeOnImpact)
-            {
-                ExplodeUmbrella();
-            }
-        } 
-    }
-    private float timer = 0;
+            } 
+        }
+    }   
     private void Update()
     {  
         if (timer < maxLifetime)
@@ -73,9 +70,7 @@ public class Projectile : NetworkBehaviour
         else
         {
             Destroy(gameObject);
-        }
-
-
+        } 
         if (fuseTime > 0)
         {
             fuseTime -= Time.deltaTime;
@@ -98,8 +93,6 @@ public class Projectile : NetworkBehaviour
             ExplodeServerRpc(position);
         }
     }
-    public float explodeRadius = -1;
-    public LayerMask collideMask;
     private void BaseExplode(Vector3 position)
     { 
         if (explosionEffect != null)
@@ -111,7 +104,8 @@ public class Projectile : NetworkBehaviour
             DealExplosionDamage(position);
         }
         if (dig != null) dig.ExplodeTerrain(position);
-        Destroy(gameObject);
+        //Destroy(gameObject);
+        if (hideOnImpact != null) hideOnImpact.SetActive(false);
     }
     private void DealExplosionDamage(Vector3 position)
     {
@@ -135,7 +129,11 @@ public class Projectile : NetworkBehaviour
                                 hurtbox.soldier.body.AddExplosionForce(500, position, explodeRadius);
                             }
                             //Debug.DrawLine(position, hit.point, Color.red, 10);
-                            hurtbox.DealDamageUmbrella(damage);
+                            //calculate damage
+                            float modifier = hit.distance / explodeRadius;
+                            int distanceDamage = Mathf.Clamp(Mathf.RoundToInt(damage * modifier), 0, 999);
+                            //Debug.Log(distanceDamage);
+                            hurtbox.DealDamageUmbrella(distanceDamage);
                         }
                         break;
                     }
@@ -146,13 +144,7 @@ public class Projectile : NetworkBehaviour
                 }
             }
         }
-    }
-    [SerializeField] private ProjectileTerrainDig dig;
-    private void OnDrawGizmos()
-    {
-        //Gizmos.DrawWireSphere(transform.position, explodeRadius);
-    }
-
+    }  
     [ClientRpc]
     private void ExplodeClientRpc(Vector3 position)
     {
