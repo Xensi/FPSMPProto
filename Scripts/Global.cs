@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using System;
-using UnityEngine;
+using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
+using UnityEngine;
 public class Global : NetworkBehaviour
 {
     public static Global Instance { get; private set; }
@@ -10,14 +10,17 @@ public class Global : NetworkBehaviour
     public Transform directionOfBattle;
     public ArmyBase base0;
     public ArmyBase base1;
-    public NetworkVariable<int> moneyBase0 = new(); 
+    public NetworkVariable<int> moneyBase0 = new();
     public NetworkVariable<int> moneyBase1 = new();
     //list of terrain dig events to be sent to joining clients, held only serverside
     public List<DigEvent> digEvents;
     public List<Color> teamColors;
     public GameObject pauseParent;
+    public TMP_Text moneyText;
+    public NetworkVariable<int> numTeam0 = new();
+    public NetworkVariable<int> numTeam1 = new();
     private void Awake()
-    {  
+    {
         if (Instance != null && Instance != this)
         {
             Destroy(this);
@@ -25,17 +28,44 @@ public class Global : NetworkBehaviour
         else
         {
             Instance = this;
-        } 
+        }
     }
     private void Start()
     {
         pauseParent.SetActive(false);
     }
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            moneyBase0.Value = 0;
+            moneyBase1.Value = 0;
+            numTeam0.Value = 1;
+            numTeam1.Value = 0;
+            InvokeRepeating(nameof(PayBases), 0, 30);
+        }
+    }
+    public Hurtbox localPlayerBox;
+    private void UpdateMoney()
+    {
+        if (localPlayerBox != null)
+        {
+            string start = "Money: ";
+            if (localPlayerBox.team.Value == 0)
+            {
+                moneyText.text = start + moneyBase0.Value;
+            }
+            else
+            {
+                moneyText.text = start + moneyBase1.Value;
+            }
+        }
+    }
     private bool pauseShown = false;
     private void Update()
-    { 
+    {
         if (Input.GetKeyDown(KeyCode.Escape))
-        { 
+        {
             if (pauseShown)
             {
                 pauseShown = false;
@@ -45,20 +75,11 @@ public class Global : NetworkBehaviour
             else
             {
                 pauseShown = true;
-                Cursor.lockState = CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.Confined;
                 pauseParent.SetActive(true);
             }
         }
-        
-    }
-    public override void OnNetworkSpawn()
-    {
-        if (IsServer)
-        {
-            moneyBase0.Value = 0;
-            moneyBase1.Value = 0;
-            InvokeRepeating(nameof(PayBases), 0, 30);
-        }
+        UpdateMoney();
     }
     private void PayBases()
     {
@@ -68,16 +89,46 @@ public class Global : NetworkBehaviour
             moneyBase0.Value += payout;
             moneyBase1.Value += payout;
         }
-    } 
+    }
     public void RecruitInfantry(int type = 0)
     {
         //get team
         int team = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<Hurtbox>().team.Value;
+        ulong id = NetworkManager.LocalClientId;
+        int money;
+        if (team == 0)
+        {
+            money = moneyBase0.Value;
+        }
+        else
+        {
+            money = moneyBase1.Value;
+        }
+        int cost = 0;
+        if (type == 0)
+        {
+            cost = 10;
+        }
+        else if (type == 1)
+        {
+            cost = 30;
+        }
 
-        RecruitServerRpc(team, type);
+        if (money >= cost)
+        {
+            if (team == 0)
+            {
+                moneyBase0.Value -= cost;
+            }
+            else
+            {
+                moneyBase1.Value -= cost;
+            }
+            RecruitServerRpc(team, type, id);
+        }
     }
-    [ServerRpc]
-    private void RecruitServerRpc(int team, int type)
+    [ServerRpc(RequireOwnership = false)]
+    private void RecruitServerRpc(int team, int type, ulong id)
     {
         ArmyBase armyBase;
         if (team == 0)
@@ -89,21 +140,56 @@ public class Global : NetworkBehaviour
             armyBase = base1;
         }
 
-        armyBase.RecruitSoldier(type);
+        armyBase.RecruitSoldier(type, id);
         //infantry = 0, artillery = 1 
     }
-    public void SwitchTeam()
+    public void LocalPlayerSwitchTeams()
     {
-        //get id of the client that wants to switch teams
-        ulong id = NetworkManager.LocalClient.ClientId; 
-        TellClientToSwitchServerRpc(id);
-    } 
-    [ServerRpc]
-    public void TellClientToSwitchServerRpc(ulong id)
-    {
-        Hurtbox box = NetworkManager.ConnectedClients[id].PlayerObject.GetComponentInChildren<Hurtbox>();
-        box.SwitchTeam();
+        //get player and switch their team to opposing side  
+        byte team = (byte)localPlayerBox.team.Value;
+        if (team == 0)
+        {
+            team = 1; //now team to switch to 
+        }
+        else
+        {
+            team = 0;
+        }
+        SwitchToTeam(team);
+        //localPlayerBox.FinishSwitchingTeams();
     }
+    public Camera mapCamera;
+    public void SwitchToTeam(byte team = 0)
+    {
+        //tell server to change that player's team
+        if (IsServer)
+        {
+            localPlayerBox.team.Value = team; 
+        }
+        else
+        {
+            ulong id = NetworkManager.LocalClient.ClientId;
+            TellServerToSwitchTeamServerRpc(id, team);
+        }
+    }
+    [ServerRpc(RequireOwnership = false)] //server owns it but anyone can invoke it
+    public void TellServerToSwitchTeamServerRpc(ulong id, byte team = 0)
+    {
+        //server switches value
+        Hurtbox box = NetworkManager.ConnectedClients[id].PlayerObject.GetComponentInChildren<Hurtbox>();
+        box.team.Value = team; 
+    } 
+    /*if (team == 0)
+    {
+        numTeam1.Value++;
+        numTeam0.Value--;
+    }
+    else
+    {
+        numTeam1.Value--;
+        numTeam0.Value++;
+    } */ 
+
     [ClientRpc]
     public void DigClientRpc(Vector3 position, DigType type)
     {
@@ -117,9 +203,9 @@ public class Global : NetworkBehaviour
         DigEvent dig = new();
         dig.position = position;
         dig.type = type;
- /*       dig.strength = strength;
-        dig.brushWidth = width;
-        dig.brushHeight = height;*/
+        /*       dig.strength = strength;
+               dig.brushWidth = width;
+               dig.brushHeight = height;*/
         digEvents.Add(dig);
         return dig;
     }
@@ -138,7 +224,7 @@ public class Global : NetworkBehaviour
         Trench
     }
 
-    public void Dig (DigEvent dig) //DigType type, Vector3 position
+    public void Dig(DigEvent dig) //DigType type, Vector3 position
     {
         switch (dig.type)
         {

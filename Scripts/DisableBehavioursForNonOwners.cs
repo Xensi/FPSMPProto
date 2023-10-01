@@ -5,7 +5,8 @@ using Unity.Netcode;
 
 public class DisableBehavioursForNonOwners : NetworkBehaviour
 {   //disable components that are used only by the client on other players' games
-    public List<Behaviour> behaviours; 
+    public List<Behaviour> behaviours;
+    public List<Renderer> renderers;
     //cosmetic items should remain enabled, like jolt
     public override void OnNetworkSpawn()
     {  
@@ -15,14 +16,18 @@ public class DisableBehavioursForNonOwners : NetworkBehaviour
             {
                 item.enabled = false;
             }
-             
+
+            foreach (Renderer item in renderers)
+            {
+                item.enabled = false;
+            }
             enabled = false; 
         } 
 
         if (!IsServer) //if we are not the server, then tell global to update terrain for us
         {
             TerrainServerRpc(OwnerClientId);
-        }
+        } 
     } 
     [ServerRpc (RequireOwnership = false)]
     private void TerrainServerRpc(ulong clientId)

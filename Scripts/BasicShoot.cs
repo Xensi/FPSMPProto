@@ -46,7 +46,7 @@ public class BasicShoot : NetworkBehaviour
         {
             weaponTimer += Time.deltaTime;
         }
-        if (playerControlled)
+        if (playerControlled && Cursor.lockState == CursorLockMode.Locked)
         { 
             PlayerControl();
         }
@@ -55,6 +55,24 @@ public class BasicShoot : NetworkBehaviour
             accumulatedSpread = Mathf.Clamp(accumulatedSpread -= Time.deltaTime * recoveryScale, baseSpread, maxSpread);
         }
         //Debug.DrawRay(muzzle.transform.position, transform.forward * 2, Color.blue);
+        AllowedToShoot();
+    }
+    private void AllowedToShoot()
+    {
+        bool val;
+        if (switcher.reloading || hurtbox.bandageTimer > 0) //reloading or bandaging
+        {
+            val = false;
+        }
+        else if (hurtbox.spawner != null && hurtbox.spawner.mapOpen)
+        {
+            val = false;
+        }
+        else
+        {
+            val = true;
+        }
+        allowedToShoot = val;
     }
     private void PlayerControl()
     {
@@ -156,15 +174,31 @@ public class BasicShoot : NetworkBehaviour
         tempASource.clip = clip;
         tempASource.volume = volume;
         tempASource.pitch = pitch;
-        tempASource.spatialBlend = 1; //3d   
+        tempASource.spatialBlend = .95f; //3d   //should be .9?
         tempASource.Play(); // start the sound
         Destroy(tempGO, tempASource.clip.length * pitch); // destroy object after clip duration (this will not account for whether it is set to loop) 
         return tempASource;
     }
+    public void AIThrow(AISoldier.ThrowData throwData, bool designatedTarget)
+    {
+        if (!allowedToShoot) return;
+        if (weaponTimer >= timeBetweenShots && switcher.activeWeaponType.availableAmmo > 0)
+        {
+            weaponTimer = 0;
+            ClientThrow(throwData, designatedTarget);
+        }
+    }
+    private void ClientThrow(AISoldier.ThrowData throwData, bool designatedTarget) //with throw data
+    {
+        switcher.SubtractAmmo(ammoPerShot);
+        ThrowOverlord(throwData.ThrowVelocity, designatedTarget);
+        ShowGunCosmeticEffects();
+        //SuppressAI();
+    }
     private void ClientShoot() //shoot raycast at target client side
     { 
         switcher.SubtractAmmo(ammoPerShot);
-        ProjectileOverlord(inheritMomentum);
+        ProjectileOverlord();//inheritMomentum
         ShowGunCosmeticEffects();
         SuppressAI();
     }
@@ -186,10 +220,74 @@ public class BasicShoot : NetworkBehaviour
                     }
                 }
             }
-        } 
+        }
     }
-    private void ProjectileOverlord(bool inheritVelocity = false)
+    private void ThrowOverlord(Vector3 throwVelocity, bool designatedTarget)
     { 
+        for (int i = 0; i < pelletsPerShot; i++)
+        {
+            //Get direction of throw
+            //Vector3 dir = throwVelocity.normalized;
+            //Get power of throw
+            float spread = switcher.activeWeaponType.data.baseSpread;
+            if (designatedTarget) spread *= 0.5f; //designating target manually is more accurate
+            Vector3 randomOffset = new(Random.Range(-spread, spread), Random.Range(-spread, spread), Random.Range(-spread, spread));
+            //accumulatedSpread += spreadPerShot;   
+
+            //Vector3 dir;
+            Vector3 position;
+            if (playerControlled)
+            {
+                //dir = transform.forward + randomOffset;
+                position = muzzle.transform.position;
+            }
+            else
+            {
+                //dir = fixedFiringPosition.forward + randomOffset;
+                position = fixedFiringPosition.transform.position; 
+            }
+            ThrowUmbrella(throwVelocity + randomOffset, position);
+        }
+    }
+    private void ThrowUmbrella(Vector3 throwVelocity, Vector3 position)
+    {
+        ThrowProjectile(IsServer, throwVelocity, position); //server has the "real" (damaging) projectile
+        if (IsServer)
+        {
+            ThrowClientRpc(throwVelocity, position); //server tells clients about projectile
+        }
+        else
+        {
+            ThrowServerRpc(throwVelocity, position);//ask server to tell clients
+        }
+    }
+    private void ThrowProjectile(bool real, Vector3 throwVelocity, Vector3 position)
+    {
+        Projectile proj = Instantiate(projectile, position, Quaternion.identity);
+        proj.damage = damage;
+        //proj.transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+        //proj.body.AddForce(dir.normalized * force, ForceMode.Impulse); // * force
+        proj.body.velocity = throwVelocity;
+        proj.real = real;
+        //proj.id = OwnerClientId;
+        proj.team = hurtbox.team.Value;
+        proj.firedByPlayer = playerControlled;
+    }
+    [ClientRpc]
+    private void ThrowClientRpc(Vector3 throwVelocity, Vector3 position)
+    {
+        if (!IsOwner)
+        {
+            ThrowProjectile(IsServer,  throwVelocity, position);
+        }
+    }
+    [ServerRpc]
+    private void ThrowServerRpc(Vector3 throwVelocity, Vector3 position)
+    {
+        ThrowClientRpc(throwVelocity, position);
+    }
+    private void ProjectileOverlord()
+    { //bool inheritVelocity = false
         for (int i = 0; i < pelletsPerShot; i++)
         {
             //float charge = chargedFloat;
@@ -224,31 +322,6 @@ public class BasicShoot : NetworkBehaviour
             }*/
         }
     } 
-    /*private void InheritProjectileUmbrella(Vector3 randomOffset, Vector3 bodyVel, float charge)
-    {
-        ShootProjectile(IsServer, randomOffset, bodyVel, charge); //server has the "real" (damaging) projectile
-        if (IsServer)
-        {
-            InheritProjectileClientRpc(randomOffset, bodyVel, charge); //server tells clients about projectile
-        }
-        else
-        {
-            InheritProjectileServerRpc(randomOffset, bodyVel, charge);//ask server to tell clients
-        }
-    }
-    [ClientRpc]
-    private void InheritProjectileClientRpc(Vector3 randomOffset, Vector3 bodyVel, float charge)
-    {
-        if (!IsOwner)
-        {
-            ShootProjectile(IsServer, randomOffset,  bodyVel, charge);
-        }
-    }
-    [ServerRpc]
-    private void InheritProjectileServerRpc(Vector3 randomOffset, Vector3 bodyVel, float charge)
-    {
-        InheritProjectileClientRpc(randomOffset, bodyVel, charge);
-    }*/ 
     private void ProjectileUmbrella(Vector3 dir, Vector3 position)
     {
         ShootProjectile(IsServer, dir, position); //server has the "real" (damaging) projectile
@@ -297,5 +370,30 @@ public class BasicShoot : NetworkBehaviour
         proj.real = real;
         proj.id = OwnerClientId;
         proj.firedByPlayer = playerControlled; 
+    }*/
+    /*private void InheritProjectileUmbrella(Vector3 randomOffset, Vector3 bodyVel, float charge)
+    {
+        ShootProjectile(IsServer, randomOffset, bodyVel, charge); //server has the "real" (damaging) projectile
+        if (IsServer)
+        {
+            InheritProjectileClientRpc(randomOffset, bodyVel, charge); //server tells clients about projectile
+        }
+        else
+        {
+            InheritProjectileServerRpc(randomOffset, bodyVel, charge);//ask server to tell clients
+        }
+    }
+    [ClientRpc]
+    private void InheritProjectileClientRpc(Vector3 randomOffset, Vector3 bodyVel, float charge)
+    {
+        if (!IsOwner)
+        {
+            ShootProjectile(IsServer, randomOffset,  bodyVel, charge);
+        }
+    }
+    [ServerRpc]
+    private void InheritProjectileServerRpc(Vector3 randomOffset, Vector3 bodyVel, float charge)
+    {
+        InheritProjectileClientRpc(randomOffset, bodyVel, charge);
     }*/
 }

@@ -156,6 +156,10 @@ PrefabInstance:
       propertyPath: explosionEffect
       value: 
       objectReference: {fileID: 7227745483280444750, guid: 8c10c985e4198a942837b0f5d380f29b, type: 3}
+    - target: {fileID: 2405006166133232060, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
+      propertyPath: destroyOnExplosion
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3497340478110618072, guid: 7f5f0c82e8aa2f849a01514ec028d914, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 951099334

@@ -52,13 +52,19 @@ public class AdvancedPlayerMovement : NetworkBehaviour
     }
     private void Update()
     {
-        LookAround();
-        CheckJumping();
-        CheckCrouching();
+        if (Cursor.lockState == CursorLockMode.Locked)
+        { 
+            LookAround();
+            CheckJumping();
+            CheckCrouching();
+        }
     }
     void FixedUpdate()
     {
-        Movement();
+        if (Cursor.lockState == CursorLockMode.Locked)
+        { 
+            Movement();
+        }
     }
     private void CheckCrouching()
     {

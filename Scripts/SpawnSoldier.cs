@@ -14,6 +14,9 @@ public class SpawnSoldier : NetworkBehaviour
     public LayerMask lookDesignatorMask;
     public Hurtbox hurtbox;
     public float spread = 3;
+    private ArmyBase ourBase;
+    //player should know what soldiers they have recruited
+    public List<AISoldier> commandableSoldiers;
     public override void OnNetworkSpawn()
     {
         designator = Instantiate(designatorPrefab, transform.position, Quaternion.identity);
@@ -32,8 +35,67 @@ public class SpawnSoldier : NetworkBehaviour
         }
         RetreatCommand();
     }
+    public void LoseCommandOfAll()
+    {
+        commandableSoldiers.Clear();
+    }
+    private void OpenMap()
+    {
+        mapOpen = true;
+        Global.Instance.mapCamera.enabled = true;
+        Cursor.lockState = CursorLockMode.Confined;
+    }
+    private void CloseMap()
+    {
+        mapOpen = false;
+        Global.Instance.mapCamera.enabled = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+    public bool mapOpen = false;
+    private Vector3 firePosition;
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(firePosition, 30);
+    }
+    private Vector3 movePosition;
     private void Update()
     { 
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if (mapOpen)
+            {
+                CloseMap();
+            }
+            else
+            {
+                OpenMap(); 
+            }
+        } 
+        if (mapOpen)
+        {
+            if (Input.GetMouseButtonDown(0))
+            { 
+                RaycastHit hit;
+                Ray ray = Global.Instance.mapCamera.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    firePosition = hit.point;
+                    CommandArtilleryFirePoint(firePosition);
+                }
+            }
+            if (Input.GetMouseButtonDown(1)) //temporary, make it so that it moves only selected units, and fix control scheme 
+            {
+                RaycastHit hit;
+                Ray ray = Global.Instance.mapCamera.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    movePosition = hit.point;
+                    CommandMoveToPosition();
+                }
+            }
+        }
         if (Input.GetKeyDown(KeyCode.E))
         {
             ClearTargets();
@@ -70,9 +132,9 @@ public class SpawnSoldier : NetworkBehaviour
         {
             LookInThatDirection();
         }*/
-        RepeatCommand();
+        //RepeatCommand();
     }
-    private Vector3 lastDestination;
+    public Vector3 lastDestination;
     private void RepeatCommand()
     { 
         SoldiersGoToDestination(lastDestination);
@@ -99,15 +161,14 @@ public class SpawnSoldier : NetworkBehaviour
         lastDestination = destination;
         //SoldiersGoToDestination(destination);
     }
-    private ArmyBase ourBase;
     private void SoldiersGoToDestination(Vector3 destination)
     {
-        ourBase.CullDeadSoldiers();
+        CullDeadSoldiers();
         //generate line formation
         int x = 0;
-        int _unitWidth = ourBase.spawnedSoldiers.Count;
+        int _unitWidth = commandableSoldiers.Count;
         var middleOffset = new Vector3(_unitWidth * 0.5f * spread, 0, 0);
-        foreach (AISoldier item in ourBase.spawnedSoldiers)
+        foreach (AISoldier item in commandableSoldiers)
         {
             item.movementState = AISoldier.MovementStates.MovingToCommandedPosition;
             Vector3 pos = destination;
@@ -115,6 +176,18 @@ public class SpawnSoldier : NetworkBehaviour
             pos -= middleOffset;
             item.destPos = pos;
             x++;
+        }
+    } 
+    public void CullDeadSoldiers()
+    {
+        //clear empty spots
+
+        for (int i = commandableSoldiers.Count - 1; i >= 0; i--)
+        {
+            if (!commandableSoldiers[i].hurtbox.alive)
+            {
+                commandableSoldiers.RemoveAt(i);
+            }
         }
     }
     private void RetreatCommand()
@@ -133,11 +206,29 @@ public class SpawnSoldier : NetworkBehaviour
         lastDestination = destination;
         //SoldiersGoToDestination(destination);
     }
+    private void CommandMoveToPosition()
+    {
+        lastDestination = movePosition;
+        SoldiersGoToDestination(lastDestination);
+    }
     private void CommandGoToTarget()
     {
         lastDestination = designator.transform.position;
-        //SoldiersGoToDestination(designator.transform.position);
+        SoldiersGoToDestination(designator.transform.position);
     }
+    private void CommandArtilleryFirePoint(Vector3 firePoint)
+    { 
+        CullDeadSoldiers();  
+        foreach (AISoldier item in commandableSoldiers)
+        {
+            if (item.soldierType == AISoldier.SoldierTypes.Artillery)
+            { 
+                item.firingState = AISoldier.FiringStates.FiringAtLocation;
+                item.positionToFireAt = firePoint;
+            }
+        }
+    }
+
     private void ShowLookTarget()
     {
         lookDesignator.SetActive(true);

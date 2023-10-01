@@ -20,22 +20,10 @@ public class ArmyBase : NetworkBehaviour
     { 
         if (IsServer)
         { 
-            InvokeRepeating(nameof(ReinforcementWave), 0, 60);
+            //InvokeRepeating(nameof(ReinforcementWave), 0, 60);
         }
     }
-    public void CullDeadSoldiers()
-    { 
-        //clear empty spots
-
-        for (int i = spawnedSoldiers.Count - 1; i >= 0; i--)
-        {
-            if (!spawnedSoldiers[i].hurtbox.alive)
-            {
-                spawnedSoldiers.RemoveAt(i);
-            }
-        }
-    }
-    private void ReinforcementWave()
+    /*private void ReinforcementWave()
     {
         if (!spawnSoldiers) return;
         CullDeadSoldiers();
@@ -59,25 +47,42 @@ public class ArmyBase : NetworkBehaviour
                 break;
             }
         }
-    }
-    public void RecruitSoldier(int type = 0)
+    }*/
+    public void RecruitSoldier(int type = 0, ulong id = 0)
     {
         Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Count)];
         AISoldier prefab = soldierPrefabs[type];
-        SpawnSoldierUmbrella(spawn, prefab);
+        SpawnSoldierUmbrella(spawn, prefab, id);
     }
-    private void SpawnSoldierUmbrella(Transform trans, AISoldier prefab)
+    private void SpawnSoldierUmbrella(Transform trans, AISoldier prefab, ulong id)
     { //only server can spawn
         if (IsServer)
         {
             AISoldier soldier = Instantiate(prefab, trans.position, Quaternion.identity);
-            //soldier.netObj.SpawnWithOwnership(NetworkManager.ConnectedClientsIds[0]);
+            //soldier.netObj.SpawnWithOwnership(id);
             soldier.netObj.Spawn();
             soldier.hurtbox.team.Value = team;
             soldier.SetLayers();
-            spawnedSoldiers.Add(soldier);
-
+            //spawnedSoldiers.Add(soldier);
+            //send message to client adding soldier to their list 
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { id }
+                }
+            };
+            AddSoldierClientRpc(soldier, clientRpcParams);
         } 
+    } 
+    [ClientRpc]
+    private void AddSoldierClientRpc(NetworkBehaviourReference soldier, ClientRpcParams clientRpcParams = default)
+    {
+        if (soldier.TryGet(out AISoldier sol))
+        { 
+            SpawnSoldier spawner = NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<SpawnSoldier>();
+            spawner.commandableSoldiers.Add(sol);
+        }
     }
     /// <summary>
     /// Non-server client tells server to spawn in a minion and grant ownership to the client.

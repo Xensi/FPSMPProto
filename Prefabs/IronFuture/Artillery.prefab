@@ -70,7 +70,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5474626561547328258, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
       propertyPath: m_Name
-      value: Soldier Variant
+      value: Artillery
+      objectReference: {fileID: 0}
+    - target: {fileID: 6280676031596710573, guid: b9e29ac2069b7e74b87c04556fddcf77, type: 3}
+      propertyPath: soldierType
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

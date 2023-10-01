@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db33296f778c2584fa72bd8fb98f6d79, type: 3}
-  m_Name: RPGAI 1
+  m_Name: AIArtilleryWeapon
   m_EditorClassIdentifier: 
   timeBetweenShots: 1
   gunSound: {fileID: 8300000, guid: 421b860a7b03c934d913eabe6c7e9620, type: 3}
   reloadSound: {fileID: 0}
-  baseSpread: 0.01
+  baseSpread: 10
   spreadPerShot: 0
-  maxSpread: 1
+  maxSpread: 0
   recoveryScale: 0.1
   pelletsPerShot: 1
   damage: 100
@@ -34,4 +34,4 @@ MonoBehaviour:
   joltZ: 25
   joltReturnSpeed: 50
   aiIndirectFire: 1
-  aiRatio: 0.5
+  aiRatio: 0.1

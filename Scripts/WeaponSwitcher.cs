@@ -81,7 +81,6 @@ public class WeaponSwitcher : NetworkBehaviour
                 PerformReload();
             }
         }
-        shooter.allowedToShoot = !reloading;
     }
     private void KeyPressSwitchWeapons()
     { 

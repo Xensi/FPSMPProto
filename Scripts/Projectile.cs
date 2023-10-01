@@ -22,7 +22,7 @@ public class Projectile : NetworkBehaviour
     private float timer = 0;
     [SerializeField] private ProjectileTerrainDig dig;
     public float explodeRadius = -1;
-    public LayerMask collideMask;
+    public LayerMask collideMask; 
     private void OnCollisionEnter(Collision collision)
     {
         ContactPoint contact = collision.GetContact(0);
@@ -88,6 +88,7 @@ public class Projectile : NetworkBehaviour
         }
         RotateTowardsMovement();
     }
+    private bool hasExploded = false;
     private void RotateTowardsMovement()
     {
         Vector3 dir = body.velocity.normalized;
@@ -96,17 +97,23 @@ public class Projectile : NetworkBehaviour
     }
     private void ExplodeUmbrella()
     {
-        Vector3 position = transform.position;
-        BaseExplode(position);
-        if (IsServer)
+        if (!hasExploded)
         {
-            ExplodeClientRpc(position);
-        }
-        else
-        {
-            ExplodeServerRpc(position);
+            hasExploded = true;
+
+            Vector3 position = transform.position;
+            BaseExplode(position);
+            if (IsServer)
+            {
+                ExplodeClientRpc(position);
+            }
+            else
+            {
+                ExplodeServerRpc(position);
+            }
         }
     }
+    public bool destroyOnExplosion = false;
     private void BaseExplode(Vector3 position)
     { 
         if (explosionEffect != null)
@@ -120,6 +127,10 @@ public class Projectile : NetworkBehaviour
         if (dig != null) dig.ExplodeTerrain(position);
         //Destroy(gameObject);
         if (hideOnImpact != null) hideOnImpact.SetActive(false);
+        if (destroyOnExplosion)
+        {
+            Destroy(gameObject);
+        }
     }
     private void DealExplosionDamage(Vector3 position)
     {

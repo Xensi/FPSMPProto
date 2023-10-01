@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 0.62540454, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.61449826, b: 0, a: 0.41568628}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -108,7 +108,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 167312, guid: c06575f5b5642894da5e0448519f93ab, type: 3}
       propertyPath: m_Name
-      value: YellowFireRocketImpactV3 Variant 1
+      value: YellowFireRocketImpactV3 Variant 2
       objectReference: {fileID: 0}
     - target: {fileID: 464894, guid: c06575f5b5642894da5e0448519f93ab, type: 3}
       propertyPath: m_RootOrder

@@ -28,6 +28,6 @@ public class WeaponData : ScriptableObject
 
     [Header("AI Behavior")]
     public bool aiIndirectFire = false;
-    public float aiRatio = 0.5f;
+    public float aiRatio = 0.5f; 
 
 }

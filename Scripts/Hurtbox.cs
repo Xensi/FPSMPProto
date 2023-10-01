@@ -17,7 +17,7 @@ public class Hurtbox : NetworkBehaviour
     [SerializeField] private AdvancedPlayerMovement playerMovement;
 
     private int bandages = 3;
-    private float bandageTimer = 0;
+    public float bandageTimer = 0;
     private float bandageFinishTime = 3;
     public bool alive = true;
 
@@ -42,21 +42,20 @@ public class Hurtbox : NetworkBehaviour
             bandageSlider.value = 0;
             bandageSlider.gameObject.SetActive(false);
         }
-        UpdateTeamColor();
 
     }
-    public void SwitchTeam()
+    /*public void SwitchToTeam()
     { 
-        if (team.Value == 0)
-        {
-            team.Value = 1;
-        }
-        else
-        {
-            team.Value = 0;
-        }
-        UpdateTeamColor();
+        LoseAllCommandableSoldiers(); 
         Respawn();
+    }*/
+    public SpawnSoldier spawner;
+    private void LoseAllCommandableSoldiers()
+    {
+        if (spawner != null)
+        { 
+            spawner.LoseCommandOfAll();
+        }
     }
     private void UpdateTeamColor()
     { 
@@ -64,13 +63,56 @@ public class Hurtbox : NetworkBehaviour
         {
             teamSprite.color = Global.Instance.teamColors[team.Value];
         }
+        if (mapSprite != null)
+        {
+            mapSprite.color = Global.Instance.teamColors[team.Value];
+        }
     }
+    public SpriteRenderer mapSprite;
     public override void OnNetworkSpawn()
     {
+        if (IsLocalPlayer)
+        {
+            Global.Instance.localPlayerBox = this; 
+        }
+        Respawn();
+        //JoinTeamWithLessPeople(); 
+    }
+    private void JoinTeamWithLessPeople() //NOT WORKING RN
+    {
+        if (IsServer)
+        {
+            //team 0 count at 1;
+            Respawn();
+        }
+        else
+        {
+            //check what team has less people
+            /*byte teamWithLessPeople = 0; //0 stays on team 0
+            if (Global.Instance.numTeam0.Value > Global.Instance.numTeam1.Value)
+            {
+                teamWithLessPeople = 1;
+            }*/
+            Respawn();
+        } 
+    }
+    int oldTeam = 0;
+    private void DetectTeamSwitchLocal()
+    {
+        if (team.Value != oldTeam)
+        {
+            oldTeam = team.Value;
+            FinishSwitchingTeams();
+        }
+    }
+    private void FinishSwitchingTeams()
+    {
+        LoseAllCommandableSoldiers();
         Respawn();
     }
     private void Respawn()
     {
+        UpdateTeamColor();
         if (bloodEffect != null)
         {
             bloodEffect.Stop();
@@ -121,7 +163,7 @@ public class Hurtbox : NetworkBehaviour
     private void Update()
     {
         if (IsServer)
-        { 
+        {
             /*if (playerControlled)
             { 
                 PlayerCheckIfDead();
@@ -130,46 +172,50 @@ public class Hurtbox : NetworkBehaviour
             {
                 AICheckIfDead();
             }*/
-            UpdateBleedOut();
         }
-        if (Input.GetKey(KeyCode.Q) && bandages > 0 && bleedOutTimer != -999) //slow while healing
-        {
-            if (bandageTimer < bandageFinishTime)
+        if (IsOwner && IsSpawned)
+        { 
+            UpdateBleedOut();
+            DetectTeamSwitchLocal();
+            if (Input.GetKey(KeyCode.Q) && bandages > 0 && bleedOutTimer != -999) //slow while healing
             {
-                bandageTimer += Time.deltaTime;
-                if (bandageSlider != null)
+                if (bandageTimer < bandageFinishTime)
                 {
-                    bandageSlider.value = bandageTimer;
-                    bandageSlider.gameObject.SetActive(true);
+                    bandageTimer += Time.deltaTime;
+                    if (bandageSlider != null)
+                    {
+                        bandageSlider.value = bandageTimer;
+                        bandageSlider.gameObject.SetActive(true);
+                    }
+                    if (playerMovement != null)
+                    {
+                        playerMovement.moveSpeed = playerMovement.defaultSpeed / 3;
+                    }
                 }
-                if (playerMovement != null)
+                else
                 {
-                    playerMovement.moveSpeed = playerMovement.defaultSpeed / 3;
+                    bandages--;
+                    bandageTimer = 0;
+                    FinishApplyingBandage();
+                    if (bandageSlider != null)
+                    {
+                        bandageSlider.value = 0;
+                        bandageSlider.gameObject.SetActive(false);
+                    }
                 }
             }
             else
             {
-                bandages--;
                 bandageTimer = 0;
-                FinishApplyingBandage();
                 if (bandageSlider != null)
                 {
                     bandageSlider.value = 0;
                     bandageSlider.gameObject.SetActive(false);
                 }
-            }
-        }
-        else
-        {
-            bandageTimer = 0;
-            if (bandageSlider != null)
-            {
-                bandageSlider.value = 0;
-                bandageSlider.gameObject.SetActive(false);
-            }
-            if (playerMovement != null)
-            {
-                playerMovement.moveSpeed = playerMovement.defaultSpeed;
+                if (playerMovement != null)
+                {
+                    playerMovement.moveSpeed = playerMovement.defaultSpeed;
+                }
             }
         }
     }

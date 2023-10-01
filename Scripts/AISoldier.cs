@@ -47,7 +47,12 @@ public class AISoldier : NetworkBehaviour
 		FiringAtLocation //artillery
 	}
 	public FiringStates firingState = FiringStates.SearchingForEnemies;
-	 
+	
+	public enum SoldierTypes
+    {
+		Rifleman, Artillery
+    }
+	public SoldierTypes soldierType = SoldierTypes.Rifleman;
 	void OnDisable()
 	{
 		if (IsOwner)
@@ -182,6 +187,10 @@ public class AISoldier : NetworkBehaviour
 			body.useGravity = true;
         }
     } 
+	private bool HasReachedDestination()
+    {
+		return pathfinder.reachedEndOfPath && pathfinder.remainingDistance < pathfinder.endReachedDistance;
+    } 
 	private void UpdateStates()
 	{
         switch (movementState)
@@ -201,9 +210,12 @@ public class AISoldier : NetworkBehaviour
                 }
                 break;
             case MovementStates.MovingToCommandedPosition:
-				CheckIfWayForwardBlocked();
-
+				CheckIfWayForwardBlocked(); 
 				GoToPosition();
+				if (HasReachedDestination())
+                {
+					movementState = MovementStates.TakingCover;
+                }
                 break; 
             case MovementStates.HoldingPosition:
                 break;
@@ -213,6 +225,8 @@ public class AISoldier : NetworkBehaviour
         switch (firingState)
         {
             case FiringStates.SearchingForEnemies: //actively scanning for enemy  
+
+				lastFiringState = FiringStates.SearchingForEnemies;
 				standState = StandStates.Standing;
                 CheckIfNeedReload();
                 if (focusEnemy == null)
@@ -235,13 +249,14 @@ public class AISoldier : NetworkBehaviour
                 } 
                 break;
             case FiringStates.FiringAtEnemies: //shooting at enemy    
+				lastFiringState = FiringStates.FiringAtEnemies;
 				standState = StandStates.Standing;
 				CheckIfNeedReload(); 
                 if (focusEnemy != null && enemyHurtbox != null && enemyHurtbox.alive && enemyHurtbox.team.Value != hurtbox.team.Value)
 				{
 					Vector3 heading = focusEnemy.transform.position - eyes.position;
 					if (switcher.activeWeaponType.data.aiIndirectFire)
-                    {
+					{    
 						RotateTowardsTransform(eyes, focusEnemy.transform, rotationSpeed); //rotate towards enemy
 						if (Vector3.Dot(heading.normalized, eyes.forward.normalized) >= .99f) //if eyes is pointing in direction of enemy
 						{ 
@@ -251,14 +266,15 @@ public class AISoldier : NetworkBehaviour
 								if (weaponParent != null)
 								{
 									//Vector3 angleVector = Quaternion.AngleAxis(throwData.Angle, weaponParent.right) * eyes.forward.normalized;
+									//shooter.force = throwData.ThrowVelocity.magnitude;
+									//Debug.DrawRay(transform.position, angleVector);
 									Vector3 angleVector = throwData.ThrowVelocity.normalized;
-									shooter.force = throwData.ThrowVelocity.magnitude;
-									Debug.DrawRay(transform.position, angleVector);
 									RotateTowardsDirection(weaponParent, angleVector, rotationSpeed);
 
 									if (Vector3.Dot(angleVector, weaponParent.forward.normalized) >= .99f) //if weapon matches angle
-									{  
-										TryToShoot();
+									{
+										//TryToShoot();
+										TryToThrow(throwData, false);
 									}
 								}
 							}
@@ -292,8 +308,9 @@ public class AISoldier : NetworkBehaviour
                 break;
             case FiringStates.Reloading: //reloading, out of ammo 
                 if (switcher.activeWeaponType.availableAmmo > 0)
-                {  
-					firingState = FiringStates.SearchingForEnemies;
+                {
+					firingState = lastFiringState;
+					//firingState = FiringStates.SearchingForEnemies;
 					standState = StandStates.Standing;
 				}
                 else
@@ -303,6 +320,30 @@ public class AISoldier : NetworkBehaviour
                 break;
             case FiringStates.FullyOutOfAmmo:
                 break;
+			case FiringStates.FiringAtLocation:
+				lastFiringState = FiringStates.FiringAtLocation;
+				standState = StandStates.Standing;
+				CheckIfNeedReload();
+
+				Vector3 fireDir = positionToFireAt - eyes.position;
+				RotateTowardsDirection(eyes, fireDir, rotationSpeed); //rotate towards enemy
+				if (Vector3.Dot(fireDir.normalized, eyes.forward.normalized) >= .99f) //if eyes is pointing in direction of enemy
+				{
+					throwData = CalculateFiringAngle(positionToFireAt, shooter.muzzle.transform.position, switcher.activeWeaponType.data.force, switcher.activeWeaponType.data.aiRatio);
+					if (throwData.valid)
+					{
+						if (weaponParent != null)
+						{ 
+							Vector3 angleVector = throwData.ThrowVelocity.normalized;  
+							RotateTowardsDirection(weaponParent, angleVector, rotationSpeed); 
+							if (Vector3.Dot(angleVector, weaponParent.forward.normalized) >= .99f) //if weapon matches angle
+							{
+								TryToThrow(throwData, true);
+							}
+						}
+					}
+				}
+				break;
             default:
                 break;
         }
@@ -320,6 +361,8 @@ public class AISoldier : NetworkBehaviour
 				break;
 		}
 	}
+	private FiringStates lastFiringState = FiringStates.SearchingForEnemies;
+	public Vector3 positionToFireAt;
 	/// <summary>
 	/// Throw Velocity, Angle
 	/// </summary>
@@ -403,6 +446,17 @@ public class AISoldier : NetworkBehaviour
 			DeltaXZ = deltaXZ,
 			DeltaY = deltaY
 		};
+	}
+
+	private void TryToThrow(ThrowData throwData, bool targetDesignated)
+	{
+		if (switcher.activeWeaponType.availableAmmo > 0)
+		{
+			if (shooter != null)
+			{
+				shooter.AIThrow(throwData, targetDesignated);
+			}
+		}
 	}
 	private void TryToShoot()
     {
@@ -490,7 +544,7 @@ public class AISoldier : NetworkBehaviour
 				}
 				else
 				{
-					//Debug.DrawRay(eyes.position, dir * 100, Color.white);
+					Debug.DrawRay(eyes.position, dir * 100, Color.white);
 				}
 			}
 		} 
