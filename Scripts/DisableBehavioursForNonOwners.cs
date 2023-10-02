@@ -26,11 +26,11 @@ public class DisableBehavioursForNonOwners : NetworkBehaviour
 
         if (!IsServer) //if we are not the server, then tell global to update terrain for us
         {
-            TerrainServerRpc(OwnerClientId);
+            RequestPreviousTerrainChangesServerRpc(OwnerClientId);
         } 
     } 
     [ServerRpc (RequireOwnership = false)]
-    private void TerrainServerRpc(ulong clientId)
+    private void RequestPreviousTerrainChangesServerRpc(ulong clientId)
     { 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -41,16 +41,12 @@ public class DisableBehavioursForNonOwners : NetworkBehaviour
         };
 
         foreach (Global.DigEvent item in Global.Instance.digEvents)
-        {  
-            /*dig.strength = Global.Instance.digEvents[0].strength;
-            dig.brushWidth = Global.Instance.digEvents[0].brushWidth;
-            dig.brushHeight = Global.Instance.digEvents[0].brushHeight;*/
-            TerrainClientRpc(item.position, item.type, clientRpcParams); // dig.strength, dig.brushWidth, dig.brushHeight
+        {   
+            SendPreviousTerrainChangesClientRpc(item.position, item.type, clientRpcParams);
         }
-    } 
-    //could be simplified by static width height
+    }  
     [ClientRpc]
-    private void TerrainClientRpc(Vector3 position, Global.DigType type, ClientRpcParams clientRpcParams = default)
+    private void SendPreviousTerrainChangesClientRpc(Vector3 position, Global.DigType type, ClientRpcParams clientRpcParams = default)
     { //float strength, int width, int height, 
         Global.DigEvent dig = new();
         dig.position = position;

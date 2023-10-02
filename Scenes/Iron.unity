@@ -2157,6 +2157,7 @@ MonoBehaviour:
     m_InternalValue: 0
   localPlayerBox: {fileID: 0}
   mapCamera: {fileID: 2063849545}
+  coverPrefab: {fileID: 7815479999536423462, guid: a20ca8673dac45340b01a144443c1f8c, type: 3}
 --- !u!4 &1283334358
 Transform:
   m_ObjectHideFlags: 0

@@ -178,17 +178,7 @@ public class Global : NetworkBehaviour
         //server switches value
         Hurtbox box = NetworkManager.ConnectedClients[id].PlayerObject.GetComponentInChildren<Hurtbox>();
         box.team.Value = team; 
-    } 
-    /*if (team == 0)
-    {
-        numTeam1.Value++;
-        numTeam0.Value--;
-    }
-    else
-    {
-        numTeam1.Value--;
-        numTeam0.Value++;
-    } */ 
+    }  
 
     [ClientRpc]
     public void DigClientRpc(Vector3 position, DigType type)
@@ -223,7 +213,7 @@ public class Global : NetworkBehaviour
         Artillery,
         Trench
     }
-
+    public CoverPosition coverPrefab;
     public void Dig(DigEvent dig) //DigType type, Vector3 position
     {
         switch (dig.type)
@@ -239,6 +229,7 @@ public class Global : NetworkBehaviour
             default:
                 break;
         }
+        CoverPosition cover = Instantiate(coverPrefab, dig.position, Quaternion.identity);
     }
     public void LowerTerrain(Vector3 worldPosition, float strength, int brushWidth, int brushHeight)
     {

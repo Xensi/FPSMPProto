@@ -22,9 +22,11 @@ public class Projectile : NetworkBehaviour
     private float timer = 0;
     [SerializeField] private ProjectileTerrainDig dig;
     public float explodeRadius = -1;
-    public LayerMask collideMask; 
+    public LayerMask collideMask;
+    [SerializeField] private float timeBeforeCollisionsAllowed = 0;
     private void OnCollisionEnter(Collision collision)
     {
+        if (timeBeforeCollisionsAllowed > 0) return;
         ContactPoint contact = collision.GetContact(0);
         if (!damageDealt && fuseTime == -1) //no damage dealt and no fuse
         {
@@ -70,6 +72,10 @@ public class Projectile : NetworkBehaviour
     }   
     private void Update()
     {  
+        if (timeBeforeCollisionsAllowed > 0)
+        {
+            timeBeforeCollisionsAllowed -= Time.deltaTime;
+        }
         if (timer < maxLifetime)
         {
             timer += Time.deltaTime;

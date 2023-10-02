@@ -143,7 +143,8 @@ public class AISoldier : NetworkBehaviour
 	void Update()
 	{
 		if (IsOwner)
-		{ 
+		{
+			UpdateCommandTimer();
 			UpdateStates();
 
 			/*
@@ -158,6 +159,19 @@ public class AISoldier : NetworkBehaviour
 			/**/
 		}
 	}
+	private MovementStates oldMoveState;
+	private void UpdateCommandTimer()
+    {
+		if (oldMoveState != movementState)
+        {
+			oldMoveState = movementState;
+			commandTimer = maxCommandTime;
+        }
+		if (commandTimer > 0)
+        {
+			commandTimer -= Time.deltaTime;
+        }
+    }
 	private void GoToUnoccupiedCover()
     {
 		if (closestCoverPos == null) //we don't know of any cover
@@ -190,7 +204,10 @@ public class AISoldier : NetworkBehaviour
 	private bool HasReachedDestination()
     {
 		return pathfinder.reachedEndOfPath && pathfinder.remainingDistance < pathfinder.endReachedDistance;
-    } 
+    }
+	private float commandTimer = 0;
+	//how long unit will obey command before taking other options
+	private float maxCommandTime = .1f;
 	private void UpdateStates()
 	{
         switch (movementState)
@@ -212,7 +229,7 @@ public class AISoldier : NetworkBehaviour
             case MovementStates.MovingToCommandedPosition:
 				CheckIfWayForwardBlocked(); 
 				GoToPosition();
-				if (HasReachedDestination())
+				if (HasReachedDestination() && commandTimer <= 0)
                 {
 					movementState = MovementStates.TakingCover;
                 }
