@@ -8,24 +8,36 @@ public class VehicleInteractor : MonoBehaviour
     public KeyCode vehicleEnterKey = KeyCode.E;
     public LayerMask vehicleEntranceMask;
     private float armLength = 2;
+    private bool inVehicle = false;
+    private Mountable vehicleWeAreInside;
     private void InteractWithVehicle()
     {
-        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, armLength, vehicleEntranceMask, QueryTriggerInteraction.Collide))
+        if (Input.GetKeyDown(vehicleEnterKey))
         {
-            Debug.DrawRay(transform.position, transform.forward * armLength);
-            if (Input.GetKeyDown(vehicleEnterKey))
+            if (inVehicle && vehicleWeAreInside != null)
             {
-                if (hit.collider.TryGetComponent(out Mountable vehicle))
+                inVehicle = vehicleWeAreInside.Interact(playerObject);
+                if (!inVehicle) vehicleWeAreInside = null;
+            }
+            else
+            {
+                if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, armLength, vehicleEntranceMask, QueryTriggerInteraction.Ignore))
                 {
-                    playerObject.transform.parent = vehicle.seats[0].transform;
-                    Debug.Log("Yep");
+                    Debug.DrawRay(transform.position, transform.forward * armLength);
+
+                    if (hit.collider.TryGetComponent(out Mountable vehicle))
+                    {
+                        inVehicle = vehicle.Interact(playerObject);
+                        if (inVehicle) vehicleWeAreInside = vehicle;
+                    }
+                }
+                else
+                {
+                    Debug.DrawRay(transform.position, transform.forward * armLength, Color.red);
                 }
             }
         }
-        else
-        { 
-            Debug.DrawRay(transform.position, transform.forward * armLength, Color.red);
-        }
+        
     }
     void Update()
     {
